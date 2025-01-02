@@ -22,8 +22,14 @@ import { Button } from 'flowbite-react';
 import Navbar from '../navbar/Navbar';
 import MainLayout from '../../Layout/MainLayout';
 import { BiCategory } from 'react-icons/bi';
-import { MdAdminPanelSettings, MdGarage } from 'react-icons/md';
+import {
+  MdAddBox,
+  MdAdminPanelSettings,
+  MdGarage,
+  MdMiscellaneousServices,
+} from 'react-icons/md';
 import useCheckPermissions from '../../hooks/useCheckPermissions';
+import { TbNotebook } from 'react-icons/tb';
 
 const themes = {
   light: {
@@ -150,8 +156,26 @@ const Sidebar = ({ children }) => {
   };
 
   const isActivePath = (path) => {
-    const currentPath = path === '/' ? '/dashboard' : path;
-    return location.pathname?.includes(currentPath);
+    const currentPath = location.pathname;
+
+    if (currentPath === '/' && path === '/dashboard') {
+      return true;
+    }
+
+    if (currentPath === path) {
+      return true;
+    }
+
+    if (
+      path !== '/' &&
+      currentPath.startsWith(path) &&
+      currentPath.length > path.length &&
+      currentPath[path.length] === '/'
+    ) {
+      return false;
+    }
+
+    return false;
   };
 
   const isDashBoardPermission = useCheckPermissions('view_dashboard');
@@ -159,6 +183,7 @@ const Sidebar = ({ children }) => {
   const isAccountPermission = useCheckPermissions('view_account');
   const isRolesPermission = useCheckPermissions('view_roles');
   const isVehiclesPermission = useCheckPermissions('view_vehicles');
+  const isCreateVehiclesPermission = useCheckPermissions('create_vehicles');
   const isModelsPermission = useCheckPermissions('view_vehicles_models');
   const isBrandsPermission = useCheckPermissions('view_vehicles_brands');
   const isTypesPermission = useCheckPermissions('view_vehicles_types');
@@ -222,8 +247,22 @@ const Sidebar = ({ children }) => {
                   Dashboard
                 </MenuItem>
               )}
-              {(isCatalogsPermission || isVehiclesPermission.hasPermission) && (
+              {(isCatalogsPermission ||
+                isVehiclesPermission.hasPermission ||
+                isCreateVehiclesPermission.hasPermission) && (
                 <SubMenu label="Vehículos" icon={<MdGarage size={23} />}>
+                  {isVehiclesPermission.hasPermission && (
+                    <MenuItem
+                      icon={<MdAddBox size={23} />}
+                      active={isActivePath('/vehicles/create')}
+                      component={<Link to={'/vehicles/create'} />}
+                      onClick={() => {
+                        setToggled(false);
+                      }}
+                    >
+                      Nuevo Vehículo
+                    </MenuItem>
+                  )}
                   {isVehiclesPermission.hasPermission && (
                     <MenuItem
                       icon={<FaCar size={23} />}
@@ -250,6 +289,28 @@ const Sidebar = ({ children }) => {
                   )}
                 </SubMenu>
               )}
+              <SubMenu label="Reportes" icon={<TbNotebook size={23} />}>
+                <MenuItem
+                  icon={<MdMiscellaneousServices size={23} />}
+                  active={isActivePath('/reports/services')}
+                  component={<Link to={'/reports/services'} />}
+                  onClick={() => {
+                    setToggled(false);
+                  }}
+                >
+                  Servicios
+                </MenuItem>
+                <MenuItem
+                  icon={<MdAdminPanelSettings size={23} />}
+                  active={isActivePath('/reports/repairs')}
+                  component={<Link to={'/reports/repairs'} />}
+                  onClick={() => {
+                    setToggled(false);
+                  }}
+                >
+                  Reparaciones
+                </MenuItem>
+              </SubMenu>
               {(isUsersPermission.hasPermission ||
                 isRolesPermission.hasPermission) && (
                 <SubMenu

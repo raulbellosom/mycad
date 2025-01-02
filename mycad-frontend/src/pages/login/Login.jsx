@@ -9,6 +9,7 @@ import { FaSignInAlt } from 'react-icons/fa';
 import TextInput from '../../components/Inputs/TextInput';
 import { MdOutlineAlternateEmail, MdOutlinePassword } from 'react-icons/md';
 import ActionButtons from '../../components/ActionButtons/ActionButtons';
+import { Button } from 'flowbite-react';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -68,18 +69,14 @@ const Login = () => {
               icon={MdOutlinePassword}
             />
             <div className="flex justify-center w-full items-center gap-4 pt-4">
-              <ActionButtons
-                extraActions={[
-                  {
-                    label: 'Iniciar Sesión',
-                    action: () => formik.submitForm(),
-                    icon: FaSignInAlt,
-                    color: 'mycad',
-                    filled: true,
-                    type: 'submit',
-                  },
-                ]}
-              />
+              <Button
+                className="w-full"
+                type="submit"
+                gradientDuoTone="pinkToOrange"
+              >
+                <FaSignInAlt className="mr-2" />
+                Iniciar Sesión
+              </Button>
             </div>
           </Form>
         </div>

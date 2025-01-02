@@ -52,7 +52,7 @@ model User {
 model Vehicle {
   id                      String             @id @default(uuid())
   acquisitionDate         DateTime
-  cost                    Float
+  cost                    Float?
   costCurrency            String?
   bookValue               Float?             
   bookValueCurrency       String?
@@ -112,18 +112,54 @@ model Model {
 }
 
 model ServiceHistory {
-  id          String    @id @default(uuid())
-  vehicleId   String
-  serviceDate DateTime
-  description String
-  cost        Float
-  comments    String?
-  createdAt   DateTime  @default(now())
-  enabled     Boolean   @default(true)
-  updatedAt   DateTime  @updatedAt
-  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id])
+  id                String   @id @default(uuid())
+  vehicleId         String
+  vehicle           Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  reportType        ServiceType
+  serviceDate       DateTime
+  description       String
+  totalCost         Float
+  comments String? 
+  attachments       ServicesFile[]  
 
-  @@index([vehicleId], map: "ServiceHistory_vehicleId_fkey")
+  replacedParts     ReplacedPart[] 
+  enabled           Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([vehicleId], map: "ServiceHistory_vehicleId_fkey") 
+}
+
+model ReplacedPart {
+  id          String     @id @default(uuid())
+  reportId    String
+  report      ServiceHistory @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  partName    String
+  actionType  ActionType
+  cost        Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum ActionType {
+  REPAIRED
+  REPLACED
+}
+
+enum ServiceType {
+  PREVENTIVE
+  CORRECTIVE
+}
+
+model ServicesFile{
+  id          String   @id @default(uuid())
+  serviceId   String
+  service     ServiceHistory @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  url         String
+  type        String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Rental {

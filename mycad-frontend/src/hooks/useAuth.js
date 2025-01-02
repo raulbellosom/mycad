@@ -55,6 +55,7 @@ export const useAuthData = (dispatch) => {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       dispatch({ type: 'LOGOUT' });
+      window.location.href = '/';
     },
     onSettled: () => setLoading(false),
   });
