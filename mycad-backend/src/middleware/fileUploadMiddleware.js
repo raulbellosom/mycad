@@ -29,11 +29,14 @@ const storage = multer.diskStorage({
     const isZIP =
       file.mimetype === "application/zip" || file.originalname.endsWith(".zip");
 
-    if (isImage || isXML || isZIP) {
-      cb(null, IMAGES_PATH);
-    } else {
-      cb(null, FILES_PATH);
+    const targetDir = isImage || isXML || isZIP ? IMAGES_PATH : FILES_PATH;
+
+    // Crear directorio si no existe
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
     }
+
+    cb(null, targetDir);
   },
   filename: (req, file, cb) => {
     // Convertir el nombre del archivo a UTF-8
@@ -44,6 +47,30 @@ const storage = multer.diskStorage({
     cb(null, `${uniqueSuffix}-${originalName}`);
   },
 });
+
+// Función para ajustar las rutas guardadas en la base de datos
+const formatFilePath = (filePath) => {
+  // Reemplazar separadores de directorios y eliminar todo antes de uploads
+  const relativePath = filePath.replace(/\\/g, "/");
+  const uploadIndex = relativePath.indexOf("uploads");
+  const cleanPath =
+    uploadIndex !== -1 ? relativePath.slice(uploadIndex) : relativePath;
+
+  // Asegurarnos de que no haya // duplicados ni un / inicial
+  return cleanPath.replace(/\/{2,}/g, "/").replace(/^\/+/, "");
+};
+
+// Procesar archivos subidos
+export const processUploadedFiles = (files) => {
+  return files.map((file) => ({
+    url: formatFilePath(file.path), // Generar URL correcta
+    type: file.mimetype,
+    metadata: JSON.stringify({
+      originalName: file.originalname,
+      size: file.size,
+    }),
+  }));
+};
 
 // Configuración de Multer
 const upload = multer({

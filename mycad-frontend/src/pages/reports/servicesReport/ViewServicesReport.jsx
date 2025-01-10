@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import {
-  MdMiscellaneousServices,
-  MdOutlineCalendarMonth,
-} from 'react-icons/md';
+import { MdMiscellaneousServices } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import { useReports } from '../../../hooks/useReports';
 import ActionButtons from '../../../components/ActionButtons/ActionButtons';
-import { FaCalendarAlt, FaCarSide, FaPen } from 'react-icons/fa';
+import { FaCalendarAlt, FaCarSide, FaFilePdf, FaPen } from 'react-icons/fa';
 import Logo from '../../../assets/logo/myc_logo.png';
 import { parseToCurrency } from '../../../utils/formatValues';
 import { RiMoneyDollarCircleFill } from 'react-icons/ri';
 import FileIcon from '../../../components/FileIcon/FileIcon';
+import { AiOutlineFieldNumber } from 'react-icons/ai';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const ViewServicesReport = () => {
   const { id } = useParams();
@@ -40,10 +40,31 @@ const ViewServicesReport = () => {
     }
   }, [state.report]);
 
+  const exportToPDF = async () => {
+    const element = document.getElementById('pdf-container'); // ID del contenedor
+    const canvas = await html2canvas(element, {
+      scale: 4, // Aumenta la escala para mayor resolución
+      useCORS: true, // Soporte para imágenes externas
+    });
+
+    const imgData = canvas.toDataURL('image/png'); // Convierte el canvas en imagen
+    const pdf = new jsPDF('portrait', 'mm', 'letter');
+
+    // Tamaño del PDF
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    // Agrega la imagen al PDF
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+    // Descarga el PDF
+    pdf.save(`Reporte_${report.folio || 'sin_folio'}.pdf`);
+  };
+
   return (
     <section className="flex flex-col bg-white shadow-md rounded-md dark:bg-gray-900 p-6 pb-10 antialiased">
       {/* Encabezado */}
-      <div className="flex flex-col-reverse md:flex-row items-center gap-4 w-full pb-4 border-b border-gray-300">
+      <div className="flex flex-col-reverse md:flex-row items-center gap-4 w-full pb-4">
         <div className="w-full h-full flex items-center text-orange-500">
           <MdMiscellaneousServices size={24} className="mr-4" />
           <h1 className="text-2xl font-bold">
@@ -54,6 +75,12 @@ const ViewServicesReport = () => {
         <div className="flex w-full md:w-auto gap-2">
           <ActionButtons
             extraActions={[
+              {
+                label: 'PDF',
+                action: exportToPDF,
+                icon: FaFilePdf,
+                color: 'danger',
+              },
               {
                 label: 'Editar',
                 href: `/reports/services/edit/${id}`,
@@ -67,7 +94,10 @@ const ViewServicesReport = () => {
       </div>
 
       {/* Detalles del reporte */}
-      <div className="mt-6 w-full max-w-4xl flex justify-center flex-col gap-4 mx-auto border p-4 rounded-lg">
+      <div
+        id="pdf-container"
+        className="mt-2 w-full max-w-4xl flex justify-center flex-col gap-2 mx-auto border p-4 rounded-lg"
+      >
         <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4">
           <div>
             <h2 className="md:text-xl font-bold">
@@ -89,11 +119,11 @@ const ViewServicesReport = () => {
           </div>
         </div>
         {report ? (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4">
             <div className="grid grid-cols-12 gap-4 w-full">
-              <div className="flex flex-col gap-2 col-span-6 md:col-span-6">
+              <div className="flex flex-col gap-2 col-span-12 md:col-span-6">
                 <h3 className="text-gray-700 font-bold text-sm">Vehículo</h3>
-                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-sm md:text-base">
+                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
                   <span className="inline-block">
                     <FaCarSide size={20} />
                   </span>
@@ -102,9 +132,9 @@ const ViewServicesReport = () => {
               </div>
               <div className="flex flex-col gap-2 col-span-6 md:col-span-3">
                 <h3 className="text-gray-700 font-bold text-sm">
-                  Fecha del servicio
+                  F. del servicio
                 </h3>
-                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-sm md:text-base">
+                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
                   <span className="inline-block">
                     <FaCalendarAlt size={20} />
                   </span>
@@ -113,9 +143,9 @@ const ViewServicesReport = () => {
               </div>
               <div className="flex flex-col gap-2 col-span-6 md:col-span-3">
                 <h3 className="text-gray-700 font-bold text-sm">FOLIO</h3>
-                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-sm md:text-base">
+                <p className="bg-gray-50 text-mycad-secondary p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
                   <span className="inline-block">
-                    <FaCarSide size={20} />
+                    <AiOutlineFieldNumber size={20} />
                   </span>
                   {report.folio || 'No disponible'}
                 </p>
@@ -125,7 +155,7 @@ const ViewServicesReport = () => {
               <h3 className="text-gray-700 font-bold text-sm mb-2">
                 Descripción
               </h3>
-              <p className="bg-gray-50 p-3 rounded-lg text-sm md:text-base">
+              <p className="bg-gray-50 min-h-16 p-3 rounded-lg text-sm md:text-base">
                 {report.description || 'No disponible'}
               </p>
             </div>
@@ -157,12 +187,12 @@ const ViewServicesReport = () => {
                           {part.partName || 'Sin nombre'}
                         </p>
                         <span
-                          className={`text-xs text-white py-1 px-2 w-fit rounded-full ${part.status === 'REPLACED' ? 'bg-mycad-secondary' : 'bg-mycad-warning'}`}
+                          className={`text-xs text-white py-1 px-2 w-fit rounded-full ${part.actionType === 'REPLACED' ? 'bg-mycad-secondary' : 'bg-mycad-warning'}`}
                         >
-                          {part.status === 'REPLACED' ? (
-                            <span className="">Reemplazada</span>
+                          {part.actionType === 'REPLACED' ? (
+                            <span>Reemplazada</span>
                           ) : (
-                            <span className="">Reparada</span>
+                            <span>Reparada</span>
                           )}
                         </span>
                       </div>
@@ -178,13 +208,13 @@ const ViewServicesReport = () => {
                 <p>No hay partes registradas.</p>
               )}
             </div>
-            {/* Comentarios adicionales */}
 
+            {/* Comentarios adicionales */}
             <div>
               <h3 className="text-gray-700 font-bold text-sm mb-2">
                 Comentarios adicionales
               </h3>
-              <p className="bg-gray-50 p-3 rounded-lg text-sm md:text-base">
+              <p className="bg-gray-50 min-h-16 p-3 rounded-lg text-sm md:text-base">
                 {report.comments || 'No hay comentarios adicionales.'}
               </p>
             </div>

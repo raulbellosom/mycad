@@ -1,6 +1,7 @@
 import { db } from "../lib/db.js";
 import path from "path";
 import { generateFolio } from "../utils/generateFolio.js";
+import { processUploadedFiles } from "../middleware/fileUploadMiddleware.js";
 
 // Obtener todos los reportes
 export const getServiceReports = async (req, res) => {
@@ -87,16 +88,8 @@ export const createServiceReport = async (req, res) => {
     // Generar el folio basado en el tipo de reporte
     const folio = await generateFolio(reportType);
 
-    // Procesar los adjuntos
-    const attachments =
-      req.files?.map((file) => ({
-        url: path.relative(process.cwd(), file.path).replace(/\\/g, "/"),
-        type: file.mimetype,
-        metadata: JSON.stringify({
-          originalName: file.originalname,
-          size: file.size,
-        }),
-      })) || [];
+    // Procesar los adjuntos usando la función del middleware
+    const attachments = req.files ? processUploadedFiles(req.files) : [];
 
     // Crear el reporte en la base de datos
     const report = await db.serviceHistory.create({
@@ -109,7 +102,7 @@ export const createServiceReport = async (req, res) => {
         totalCost: parseFloat(totalCost),
         comments,
         attachments: {
-          create: attachments,
+          create: attachments, // Guardar las rutas procesadas de los archivos
         },
         replacedParts: {
           create: JSON.parse(replacedParts || "[]").map((part) => ({
@@ -167,6 +160,7 @@ export const updateServiceReport = async (req, res) => {
       vehicleId,
     } = req.body;
 
+    // Parsear los adjuntos existentes
     const parsedExistingAttachments = existingAttachments
       ? JSON.parse(existingAttachments)
       : [];
@@ -175,31 +169,27 @@ export const updateServiceReport = async (req, res) => {
       (attachment) => attachment.id
     );
 
-    const newAttachments =
-      req.files?.map((file) => ({
-        url: path.relative(process.cwd(), file.path).replace(/\\/g, "/"),
-        type: file.mimetype,
-        metadata: JSON.stringify({
-          originalName: file.originalname,
-          size: file.size,
-        }),
-      })) || [];
+    // Procesar nuevos adjuntos
+    const newAttachments = req.files ? processUploadedFiles(req.files) : [];
 
+    // Eliminar archivos obsoletos si hay adjuntos válidos
     if (validAttachmentIds.length > 0) {
       await db.servicesFile.deleteMany({
         where: {
           serviceId: id,
           id: {
-            notIn: validAttachmentIds,
+            notIn: validAttachmentIds, // Mantener solo los adjuntos existentes
           },
         },
       });
     } else {
+      // Eliminar todos los adjuntos si no hay ninguno válido
       await db.servicesFile.deleteMany({
         where: { serviceId: id },
       });
     }
 
+    // Actualizar el reporte en la base de datos
     const updatedReport = await db.serviceHistory.update({
       where: { id },
       data: {
@@ -209,10 +199,10 @@ export const updateServiceReport = async (req, res) => {
         comments,
         reportType,
         attachments: {
-          create: newAttachments,
+          create: newAttachments, // Crear nuevos adjuntos
         },
         replacedParts: {
-          deleteMany: {},
+          deleteMany: {}, // Eliminar todas las piezas reemplazadas existentes
           create: JSON.parse(replacedParts || "[]").map((part) => ({
             partName: part.partName,
             actionType: part.actionType,

@@ -122,7 +122,7 @@ const ServicesReport = () => {
                   key={report.id}
                   className="hover:bg-neutral-50 even:bg-neutral-100"
                   onDoubleClick={() =>
-                    navigate(`/reports/services/show/${report.id}`)
+                    navigate(`/reports/services/view/${report.id}`)
                   }
                 >
                   <td className="px-4 py-2 text-nowrap">{report.folio}</td>
