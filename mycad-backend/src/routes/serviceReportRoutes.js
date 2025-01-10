@@ -1,36 +1,22 @@
 import express from "express";
-import { protect } from "../middleware/authMiddleware.js";
+import upload from "../middleware/fileUploadMiddleware.js";
 import {
   createServiceReport,
-  deleteServiceReport,
-  getAllServiceReports,
-  getServiceReportById,
+  getServiceReports,
   updateServiceReport,
+  deleteServiceReport,
+  searchServiceReports,
+  getServiceReportById,
 } from "../controllers/serviceReportController.js";
-import { upload } from "../controllers/uploadImagesController.js";
-import { processFiles } from "../controllers/uploadFilesController.js";
 
 const router = express.Router();
 
+router.get("/search", searchServiceReports);
+router.post("/", upload.array("attachments", 10), createServiceReport);
+router.get("/", getServiceReports);
 router
-  .route("/")
-  .get(protect, getAllServiceReports)
-  .post(
-    protect,
-    upload.fields([{ name: "files" }]),
-    processFiles,
-    createServiceReport
-  );
-
-router
-  .route("/:id")
-  .get(protect, getServiceReportById)
-  .put(
-    protect,
-    upload.fields([{ name: "files" }]),
-    processFiles,
-    updateServiceReport
-  )
-  .delete(protect, deleteServiceReport);
+  .get("/:id", getServiceReportById)
+  .put("/:id", upload.array("attachments", 10), updateServiceReport);
+router.delete("/:id", deleteServiceReport);
 
 export default router;

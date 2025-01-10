@@ -377,6 +377,7 @@ const Models = () => {
       {isOpenModal && (
         <ModalFormikForm
           onClose={onCloseModal}
+          size={'2xl'}
           isOpenModal={isOpenModal}
           dismissible
           title={editMode ? 'Editar Modelo' : 'Crear Modelo'}

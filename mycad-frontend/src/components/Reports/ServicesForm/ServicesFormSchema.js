@@ -1,18 +1,21 @@
 import * as Yup from 'yup';
 
 export const ServicesFormSchema = Yup.object().shape({
-  vehicleId: Yup.string().required('El vehículo es requerido'),
-  serviceType: Yup.string().required('El tipo de servicio es requerido'),
-  serviceDate: Yup.date().required('La fecha del servicio es requerida'),
-  description: Yup.string(),
-  totalCost: Yup.number().positive('El costo total debe ser positivo'),
+  vehicleId: Yup.string().required('El vehículo es obligatorio'),
+  reportType: Yup.string().required('El tipo de reporte es obligatorio'),
+  serviceDate: Yup.date().required('La fecha del servicio es obligatoria'),
+  description: Yup.string().required('La descripción es obligatoria'),
+  totalCost: Yup.number()
+    .required('El costo total es obligatorio')
+    .min(0, 'El costo no puede ser negativo'),
   comments: Yup.string().nullable(),
-  attachments: Yup.array().of(Yup.mixed()),
-  replacedParts: Yup.array().of(
-    Yup.object().shape({
-      partName: Yup.string().required('La parte es requerida'),
-      actionType: Yup.string().required('El tipo de acción es requerido'),
-      cost: Yup.number().positive('El costo debe ser positivo'),
-    }),
-  ),
+  replacedParts: Yup.array()
+    .of(
+      Yup.object().shape({
+        partName: Yup.string().required('El nombre de la parte es obligatorio'),
+        actionType: Yup.string().required('La acción es obligatoria'),
+        cost: Yup.number().min(0, 'El costo no puede ser negativo'),
+      }),
+    )
+    .nullable(),
 });

@@ -114,6 +114,7 @@ model Model {
 model ServiceHistory {
   id                String   @id @default(uuid())
   vehicleId         String
+  folio             String   @unique
   vehicle           Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   reportType        ServiceType
   serviceDate       DateTime

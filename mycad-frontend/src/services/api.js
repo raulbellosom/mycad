@@ -32,7 +32,7 @@ api.interceptors.request.use(
   },
 );
 
-const headerFormData = {
+export const headerFormData = {
   headers: {
     'Content-Type': 'multipart/form-data',
   },

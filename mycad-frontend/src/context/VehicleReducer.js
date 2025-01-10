@@ -1,11 +1,9 @@
 const VehicleReducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_VEHICLES_SUCCESS':
-      const { data, pagination } = action.payload;
       return {
         ...state,
-        vehicles: data,
-        pagination,
+        vehicles: action.payload,
         loading: false,
       };
     case 'FETCH_VEHICLE':
