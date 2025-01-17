@@ -18,6 +18,7 @@ import ImagePicker from '../../Inputs/ImagePicker';
 import { FaTachometerAlt } from 'react-icons/fa';
 import { AiOutlineFieldNumber } from 'react-icons/ai';
 import { TbNumber123 } from 'react-icons/tb';
+import SingleSelectInput from '../../Inputs/SingleSelectInput';
 
 const VehicleFormFields = ({
   vehicleModels,
@@ -44,9 +45,9 @@ const VehicleFormFields = ({
         <Field
           name="modelId"
           id="modelId"
-          component={SelectInput}
+          component={SingleSelectInput}
           icon={IoLogoModelS}
-          label="Modelo"
+          label="* Modelo"
           options={vehicleModels.map((model) => ({
             label: model.name,
             value: model.id,
@@ -83,7 +84,7 @@ const VehicleFormFields = ({
           name="mileage"
           id="mileage"
           component={TextInput}
-          label="Kilometraje"
+          label="* Kilometraje"
           icon={FaTachometerAlt}
           type="number"
           min={0}
@@ -93,7 +94,7 @@ const VehicleFormFields = ({
           name="acquisitionDate"
           id="acquisitionDate"
           component={DateInput}
-          label="Fecha de Adquisición"
+          label="* Fecha de Adquisición"
           title="Fecha de Adquisición"
           icon={MdCalendarToday}
           max={new Date().toISOString().split('T')[0]}
@@ -104,7 +105,7 @@ const VehicleFormFields = ({
           id="status"
           component={SelectInput}
           icon={MdInfo}
-          label="Estado"
+          label="* Estado"
           options={[
             { label: 'Activo', value: true },
             { label: 'Inactivo', value: false },

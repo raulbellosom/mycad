@@ -14,10 +14,8 @@ export const VehicleFormSchema = Yup.object().shape({
     )
     .typeError('La fecha de adquisición debe ser una fecha')
     .required('La fecha de adquisición es requerida'),
-  cost: Yup.number()
-    .required('El costo es requerido')
-    .positive('El costo debe ser positivo'),
-  costCurrency: Yup.string().required('La moneda es requerida'),
+  cost: Yup.number().positive('El costo debe ser positivo'),
+  costCurrency: Yup.string(),
   bookValue: Yup.number(),
   bookValueCurrency: Yup.string(),
   currentMarketValue: Yup.number(),

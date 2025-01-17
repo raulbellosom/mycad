@@ -52,7 +52,7 @@ model User {
 model Vehicle {
   id                      String             @id @default(uuid())
   acquisitionDate         DateTime
-  cost                    Float
+  cost                    Float?
   costCurrency            String?
   bookValue               Float?             
   bookValueCurrency       String?
@@ -73,6 +73,7 @@ model Vehicle {
   images                  Image[]            @relation("VehicleImages")
   rentals                 Rental[]
   serviceHistories        ServiceHistory[]
+  repairReport            RepairReport[]
   createdBy               User               @relation(fields: [createdById], references: [id])
   model                   Model              @relation(fields: [modelId], references: [id])
   conditions              VehicleCondition[]
@@ -112,18 +113,55 @@ model Model {
 }
 
 model ServiceHistory {
-  id          String    @id @default(uuid())
-  vehicleId   String
-  serviceDate DateTime
-  description String
-  cost        Float
-  comments    String?
-  createdAt   DateTime  @default(now())
-  enabled     Boolean   @default(true)
-  updatedAt   DateTime  @updatedAt
-  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id])
+  id                String   @id @default(uuid())
+  vehicleId         String
+  folio             String   @unique
+  vehicle           Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  reportType        ServiceType
+  serviceDate       DateTime
+  description       String
+  totalCost         Float
+  comments String? 
+  attachments       ServicesFile[]  
 
-  @@index([vehicleId], map: "ServiceHistory_vehicleId_fkey")
+  replacedParts     ReplacedPart[] 
+  enabled           Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([vehicleId], map: "ServiceHistory_vehicleId_fkey") 
+}
+
+model ReplacedPart {
+  id          String     @id @default(uuid())
+  reportId    String
+  report      ServiceHistory @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  partName    String
+  actionType  ActionType
+  cost        Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum ActionType {
+  REPAIRED
+  REPLACED
+}
+
+enum ServiceType {
+  PREVENTIVE
+  CORRECTIVE
+}
+
+model ServicesFile{
+  id          String   @id @default(uuid())
+  serviceId   String
+  service     ServiceHistory @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  url         String
+  type        String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Rental {
@@ -216,4 +254,59 @@ model UserImage {
   user      User?    @relation("UserImages", fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+model RepairReport {
+  id                String        @id @default(uuid()) // ID único del reporte
+  vehicleId         String                              // Relación con el vehículo reparado
+  folio             String        @unique               // Folio único del reporte
+  vehicle           Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  repairDate        DateTime                            // Fecha de la reparación
+  description       String                              // Descripción del problema reparado
+  totalCost         Float                               // Costo total de la reparación
+  comments          String?                             // Comentarios adicionales
+  attachments       RepairFile[]                        // Archivos adjuntos (facturas, fotos)
+  repairedParts     RepairedPart[]                      // Partes reparadas o reemplazadas
+  workshopType      WorkshopType                        // Tipo de taller: propio o externo
+  workshopName      String?                             // Nombre del taller (solo para talleres externos)
+  workshopContact   String?                             // Contacto del taller (solo para talleres externos)
+  enabled           Boolean        @default(true)       // Para habilitar/deshabilitar el reporte
+  createdAt         DateTime       @default(now())      // Fecha de creación
+  updatedAt         DateTime       @updatedAt           // Fecha de última modificación
+
+  @@index([vehicleId], map: "RepairReport_vehicleId_fkey")
+}
+
+
+model RepairedPart {
+  id          String         @id @default(uuid())       // ID único de la parte reparada/reemplazada
+  reportId    String                                 // Relación con el reporte de reparación
+  report      RepairReport   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  partName    String                                  // Nombre de la parte reparada
+  actionType  RepairAction                           // Tipo de acción (reparado o reemplazado)
+  cost        Float                                   // Costo asociado a la parte
+  warranty    String?                                 // Garantía asociada a la parte (opcional)
+  createdAt   DateTime       @default(now())          // Fecha de creación
+  updatedAt   DateTime       @updatedAt               // Fecha de última modificación
+}
+
+model RepairFile {
+  id          String         @id @default(uuid())      // ID único del archivo
+  repairId    String                                  // Relación con el reporte de reparación
+  repair      RepairReport    @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  url         String                                  // URL del archivo
+  type        String                                  // Tipo de archivo (imagen, factura, etc.)
+  metadata    Json?                                   // Metadatos adicionales
+  createdAt   DateTime       @default(now())          // Fecha de creación
+  updatedAt   DateTime       @updatedAt               // Fecha de última modificación
+}
+
+enum RepairAction {
+  REPAIRED
+  REPLACED
+}
+
+enum WorkshopType {
+  IN_HOUSE    // Reparación realizada en un taller propio
+  EXTERNAL    // Reparación realizada en un taller externo
 }

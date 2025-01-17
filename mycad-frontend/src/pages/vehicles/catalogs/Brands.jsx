@@ -135,11 +135,13 @@ const Brands = () => {
           saveLabel={editMode ? 'Actualizar' : 'Guardar'}
         />
       )}
-      <ModalRemove
-        isOpenModal={isDeleteModalOpen}
-        onCloseModal={() => setIsDeleteModalOpen(false)}
-        removeFunction={handleDeleteVehicleBrand}
-      />
+      {isDeleteModalOpen && (
+        <ModalRemove
+          isOpenModal={isDeleteModalOpen}
+          onCloseModal={() => setIsDeleteModalOpen(false)}
+          removeFunction={handleDeleteVehicleBrand}
+        />
+      )}
     </div>
   );
 };

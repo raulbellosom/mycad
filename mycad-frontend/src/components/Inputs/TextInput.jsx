@@ -33,7 +33,7 @@ const TextInput = ({
           {...props}
           type={inputType}
           color={touched[field.name] && errors[field.name] ? 'failure' : ''}
-          className="mt-1" // Espacio extra a la derecha para el icono
+          className="mt-1"
         />
         {props.type === 'password' && (
           <button

@@ -32,7 +32,7 @@ api.interceptors.request.use(
   },
 );
 
-const headerFormData = {
+export const headerFormData = {
   headers: {
     'Content-Type': 'multipart/form-data',
   },
@@ -640,6 +640,90 @@ export const deleteVehicleCondition = async (vehicleConditionId) => {
   try {
     const response = await api.delete(
       `/vehicles/vehicleConditions/${vehicleConditionId}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+// Service Reports
+export const getAllServiceReports = async (vehicleId) => {
+  try {
+    const response = await api.get(`/service-reports/${vehicleId}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getServiceReport = async ({ vehicleId, reportId, signal }) => {
+  try {
+    const response = await api.get(
+      `/service-reports/${vehicleId}/${reportId}`,
+      { signal },
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const createServiceReport = async (vehicleId, report) => {
+  try {
+    let data = new FormData();
+
+    if (report.files && report.files.length > 0) {
+      report.files.forEach((file) => {
+        data.append('files', file);
+      });
+    }
+
+    data.append('report', JSON.stringify(report)); // Agregar la información del reporte
+
+    const response = await api.post(
+      `/service-reports/${vehicleId}`,
+      data,
+      headerFormData,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const updateServiceReport = async (vehicleId, reportId, report) => {
+  try {
+    let data = new FormData();
+
+    if (report.files && report.files.length > 0) {
+      report.files.forEach((file) => {
+        data.append('files', file);
+      });
+    }
+
+    data.append('report', JSON.stringify(report)); // Agregar la información del reporte
+
+    const response = await api.put(
+      `/service-reports/${vehicleId}/${reportId}`,
+      data,
+      headerFormData,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const deleteServiceReport = async (vehicleId, reportId) => {
+  try {
+    const response = await api.delete(
+      `/service-reports/${vehicleId}/${reportId}`,
     );
     return response.data;
   } catch (error) {

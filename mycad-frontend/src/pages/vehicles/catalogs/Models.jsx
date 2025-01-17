@@ -377,6 +377,7 @@ const Models = () => {
       {isOpenModal && (
         <ModalFormikForm
           onClose={onCloseModal}
+          size={'2xl'}
           isOpenModal={isOpenModal}
           dismissible
           title={editMode ? 'Editar Modelo' : 'Crear Modelo'}
@@ -397,11 +398,13 @@ const Models = () => {
           saveLabel={editMode ? 'Actualizar' : 'Guardar'}
         />
       )}
-      <ModalRemove
-        isOpenModal={isRemoveModalOpen}
-        onCloseModal={() => setIsRemoveModalOpen(false)}
-        removeFunction={handleRemoveModel}
-      />
+      {isRemoveModalOpen && (
+        <ModalRemove
+          isOpenModal={isRemoveModalOpen}
+          onCloseModal={() => setIsRemoveModalOpen(false)}
+          removeFunction={handleRemoveModel}
+        />
+      )}
       {createMultipleModelsModal && (
         <ModalForm
           onClose={() => setCreateMultipleModelsModal(false)}

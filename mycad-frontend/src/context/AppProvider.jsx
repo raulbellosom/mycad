@@ -6,7 +6,9 @@ import LoadingProvider from './LoadingProvider';
 import CatalogProvider from './CatalogProvider';
 import RoleProvider from './RoleProvider';
 import PermissionProvider from './PermissionProvider';
+import ReportsProvider from './ReportsProvider';
 import { BreadcrumbProvider } from './BreadcrumbContext';
+import RepairReportsProvider from './RepairReportsProvider';
 
 const SecurityProvider = ({ children }) => (
   <AuthProvider>
@@ -19,7 +21,11 @@ const SecurityProvider = ({ children }) => (
 const DataProvider = ({ children }) => (
   <UserProvider>
     <VehicleProvider>
-      <CatalogProvider>{children}</CatalogProvider>
+      <CatalogProvider>
+        <ReportsProvider>
+          <RepairReportsProvider>{children}</RepairReportsProvider>
+        </ReportsProvider>
+      </CatalogProvider>
     </VehicleProvider>
   </UserProvider>
 );

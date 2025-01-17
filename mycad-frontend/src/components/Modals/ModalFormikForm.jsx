@@ -7,7 +7,7 @@ import { MdClose } from 'react-icons/md';
 
 const handleKeyDown = (event) => {
   if (event.key === 'Enter') {
-    event.preventDefault(); // Prevenir comportamiento por defecto
+    event.preventDefault();
     event.target.form.dispatchEvent(
       new Event('submit', { bubbles: true, cancelable: true }),
     );

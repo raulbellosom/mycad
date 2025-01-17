@@ -10,7 +10,7 @@ export const getButtonClassNames = (
     'w-full md:w-fit h-9 xl:h-10 text-sm xl:text-base transition ease-in-out duration-200 p-2 xl:p-4 flex items-center justify-center rounded-md border text-stone-800';
 
   let notFilledClasses = {
-    'hover:bg-orange-500 hover:text-white': color === 'mycad' && !disabled,
+    'hover:bg-mycad-primary hover:text-white': color === 'mycad' && !disabled,
     'hover:bg-mycad-danger hover:text-white': color === 'danger' && !disabled,
     'hover:bg-mycad-warning hover:text-white': color === 'warning' && !disabled,
     'hover:bg-mycad-success hover:text-white': color === 'success' && !disabled,
@@ -37,9 +37,11 @@ export const getButtonClassNames = (
     'hover:bg-fuchsia-500 hover:text-white': color === 'fuchsia' && !disabled,
     'hover:bg-white text-black': color === 'white' && !disabled,
     'hover:bg-black hover:text-white': color === 'black' && !disabled,
+    'hover:bg-sky-500 hover:text-white': color === 'sky' && !disabled,
+    'hover:bg-neutral-200 hover:text-white': color === 'neutral' && !disabled,
   };
   let filledClasses = {
-    'bg-orange-500 text-white border-mycad hover:bg-orange-600':
+    'bg-mycad-primary text-white border-mycad hover:bg-orange-500':
       color === 'mycad',
     'bg-mycad-danger text-white border-mycad-danger hover:bg-mycad-rose':
       color === 'danger',
@@ -91,6 +93,9 @@ export const getButtonClassNames = (
     'bg-white text-black border-white hover:bg-white': color === 'white',
     'bg-black text-white border-black hover:border-gray-200 hover:text-black hover:bg-stone-200':
       color === 'black',
+    'bg-sky-500 text-white border-sky-500 hover:bg-sky-700': color === 'sky',
+    'bg-neutral-100 text-white border-neutral-500 hover:bg-neutral-200':
+      color === 'neutral',
   };
 
   const disabledClasses = {

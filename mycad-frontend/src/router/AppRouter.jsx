@@ -21,15 +21,12 @@ import Account from '../pages/account/Account';
 import Users from '../pages/users/Users';
 import NotFound from '../pages/notFound/NotFound';
 import Roles from '../pages/roles/Roles';
-// const Login = lazy(() => import('../pages/login/Login'));
-// const Dashboard = lazy(() => import('../pages/dashboard/Dashboard'));
-// const Vehicles = lazy(() => import('../pages/vehicles/Vehicles'));
-// const CreateVehicle = lazy(() => import('../pages/vehicles/CreateVehicle'));
-// const UpdateVehicle = lazy(() => import('../pages/vehicles/UpdateVehicle'));
-// const ViewVehicle = lazy(() => import('../pages/vehicles/ViewVehicle'));
-// const Catalogs = lazy(() => import('../pages/vehicles/catalogs/Catalogs'));
-// const Account = lazy(() => import('../pages/account/Account'));
-// const NotFound = lazy(() => import('../pages/notFound/NotFound'));
+import ServicesReport from '../pages/reports/servicesReport/ServicesReport';
+import CreateServicesReport from '../pages/reports/servicesReport/CreateServicesReport';
+import UpdateServicesReport from '../pages/reports/servicesReport/UpdateServicesReport';
+import ViewServicesReport from '../pages/reports/servicesReport/ViewServicesReport';
+import RepairReports from '../pages/reports/repairReport/RepairReport';
+import CreateRepairReport from '../pages/reports/repairReport/CreateRepairReport';
 
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
@@ -67,6 +64,27 @@ const AuthorizedRoute = ({ user }) => {
                     element={<UpdateVehicle />}
                   />
                   <Route path="/vehicles/view/:id" element={<ViewVehicle />} />
+                  <Route
+                    path="/reports/services"
+                    element={<ServicesReport />}
+                  />
+                  <Route
+                    path="/reports/services/create"
+                    element={<CreateServicesReport />}
+                  />
+                  <Route
+                    path="/reports/services/edit/:id"
+                    element={<UpdateServicesReport />}
+                  />
+                  <Route
+                    path="/reports/services/view/:id"
+                    element={<ViewServicesReport />}
+                  />
+                  <Route path="/reports/repairs" element={<RepairReports />} />
+                  <Route
+                    path="/reports/repairs/create"
+                    element={<CreateRepairReport />}
+                  />
                   <Route path="/catalogs" element={<Catalogs />} />
                   <Route path="/roles" element={<Roles />} />
                   <Route

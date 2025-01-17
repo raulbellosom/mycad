@@ -2,7 +2,7 @@ import { FaCar, FaUserCircle, FaUserCog, FaUserShield } from 'react-icons/fa';
 import { HiHome } from 'react-icons/hi';
 import { MdChecklist } from 'react-icons/md';
 import { PiStackPlusFill } from 'react-icons/pi';
-import { LuPenSquare } from 'react-icons/lu';
+import { LuPenLine } from 'react-icons/lu';
 import { BiCategory } from 'react-icons/bi';
 
 const BreadcrumbsBuilder = (path) => {
@@ -25,7 +25,7 @@ const BreadcrumbsBuilder = (path) => {
     {
       label: 'Editar Vehiculo',
       href: '/vehicles/edit',
-      icon: LuPenSquare,
+      icon: LuPenLine,
     },
     {
       label: 'Detalles del Vehiculo',
