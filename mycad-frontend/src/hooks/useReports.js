@@ -66,8 +66,8 @@ export const useReports = () => {
   // Eliminar un reporte
   const removeReport = useMutation({
     mutationFn: deleteServiceReport,
-    onSuccess: (id) => {
-      dispatch({ type: 'DELETE_REPORT', payload: id });
+    onSuccess: (data) => {
+      dispatch({ type: 'DELETE_REPORT', payload: data.data });
       queryClient.invalidateQueries({ queryKey: ['reports'] });
       Notifies('success', 'Reporte eliminado correctamente');
     },

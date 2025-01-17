@@ -2,8 +2,8 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Rutas base
-const BASE_PATH = path.join(process.cwd(), "src/uploads/services");
+// Rutas base para Repair Reports
+const BASE_PATH = path.join(process.cwd(), "src/uploads/repairs");
 const IMAGES_PATH = path.join(BASE_PATH, "imagenes");
 const FILES_PATH = path.join(BASE_PATH, "files");
 
@@ -76,7 +76,7 @@ export const processUploadedFiles = (files) => {
 const upload = multer({
   storage,
   limits: {
-    fileSize: 20 * 1024 * 1024, // Tamaño máximo: 10 MB
+    fileSize: 20 * 1024 * 1024, // Tamaño máximo: 20 MB
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = [
@@ -104,4 +104,5 @@ const upload = multer({
   },
 });
 
+// Exportar el middleware para reportes de reparación
 export default upload;

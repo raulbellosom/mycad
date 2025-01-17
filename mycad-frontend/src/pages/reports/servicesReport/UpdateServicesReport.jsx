@@ -4,7 +4,7 @@ import { useReports } from '../../../hooks/useReports';
 import ServicesForm from '../../../components/Reports/ServicesForm/ServicesForm';
 import { useVehicleContext } from '../../../context/VehicleContext';
 import ActionButtons from '../../../components/ActionButtons/ActionButtons';
-import { FaSave } from 'react-icons/fa';
+import { FaEye, FaSave } from 'react-icons/fa';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -80,8 +80,8 @@ const UpdateServicesReport = () => {
 
   return (
     <section className="flex flex-col gap-3 bg-white shadow-md rounded-md dark:bg-gray-900 p-3 pb-10 antialiased">
-      <div className="flex flex-col-reverse md:flex-row items-center gap-4 w-full pb-1">
-        <div className="w-full h-full rounded-md flex items-center text-orange-500">
+      <div className="flex flex-col-reverse md:flex-row md:justify-between items-center gap-4 w-full pb-1">
+        <div className="h-full rounded-md flex items-center text-orange-500">
           <MdMiscellaneousServices size={24} className="mr-4" />
           <h1 className="text-2xl font-bold">Editar Reporte</h1>
         </div>
@@ -93,6 +93,12 @@ const UpdateServicesReport = () => {
                 action: onCancel,
                 color: 'red',
                 icon: IoMdArrowRoundBack,
+              },
+              {
+                label: 'Ver reporte',
+                href: '/reports/services/view/' + id,
+                color: 'blue',
+                icon: FaEye,
               },
               {
                 label: 'Guardar',

@@ -11,6 +11,7 @@ import FileIcon from '../../../components/FileIcon/FileIcon';
 import { AiOutlineFieldNumber } from 'react-icons/ai';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { IoMdArrowRoundBack } from 'react-icons/io';
 
 const ViewServicesReport = () => {
   const { id } = useParams();
@@ -43,19 +44,20 @@ const ViewServicesReport = () => {
   const exportToPDF = async () => {
     const element = document.getElementById('pdf-container'); // ID del contenedor
     const canvas = await html2canvas(element, {
-      scale: 4, // Aumenta la escala para mayor resolución
-      useCORS: true, // Soporte para imágenes externas
+      scale: 2, // Escala para menor tamaño
+      useCORS: true, // Permite cargar imágenes externas
+      backgroundColor: '#ffffff', // Forzar fondo blanco
     });
 
-    const imgData = canvas.toDataURL('image/png'); // Convierte el canvas en imagen
+    const imgData = canvas.toDataURL('image/jpeg', 0.8); // Usa JPEG con calidad del 80%
     const pdf = new jsPDF('portrait', 'mm', 'letter');
 
-    // Tamaño del PDF
+    // Dimensiones del PDF
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    // Agrega la imagen al PDF
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    // Agrega la imagen al PDF con compresión
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
 
     // Descarga el PDF
     pdf.save(`Reporte_${report.folio || 'sin_folio'}.pdf`);
@@ -75,6 +77,12 @@ const ViewServicesReport = () => {
         <div className="flex w-full md:w-auto gap-2">
           <ActionButtons
             extraActions={[
+              {
+                label: 'Regresar',
+                href: '/reports/services',
+                color: 'black',
+                icon: IoMdArrowRoundBack,
+              },
               {
                 label: 'PDF',
                 action: exportToPDF,
@@ -96,7 +104,7 @@ const ViewServicesReport = () => {
       {/* Detalles del reporte */}
       <div
         id="pdf-container"
-        className="mt-2 w-full max-w-4xl flex justify-center flex-col gap-2 mx-auto border p-4 rounded-lg"
+        className="mt-2 w-full max-w-4xl flex justify-center flex-col gap-2 mx-auto border p-8 rounded-lg"
       >
         <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4">
           <div>

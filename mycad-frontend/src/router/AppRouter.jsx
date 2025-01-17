@@ -25,6 +25,8 @@ import ServicesReport from '../pages/reports/servicesReport/ServicesReport';
 import CreateServicesReport from '../pages/reports/servicesReport/CreateServicesReport';
 import UpdateServicesReport from '../pages/reports/servicesReport/UpdateServicesReport';
 import ViewServicesReport from '../pages/reports/servicesReport/ViewServicesReport';
+import RepairReports from '../pages/reports/repairReport/RepairReport';
+import CreateRepairReport from '../pages/reports/repairReport/CreateRepairReport';
 
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
@@ -77,6 +79,11 @@ const AuthorizedRoute = ({ user }) => {
                   <Route
                     path="/reports/services/view/:id"
                     element={<ViewServicesReport />}
+                  />
+                  <Route path="/reports/repairs" element={<RepairReports />} />
+                  <Route
+                    path="/reports/repairs/create"
+                    element={<CreateRepairReport />}
                   />
                   <Route path="/catalogs" element={<Catalogs />} />
                   <Route path="/roles" element={<Roles />} />

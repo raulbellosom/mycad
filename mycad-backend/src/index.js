@@ -11,6 +11,7 @@ import permissionRoutes from "./routes/permissionRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
 import rolePermissionRoutes from "./routes/rolePermissionRoutes.js";
 import serviceReportRoutes from "./routes/serviceReportRoutes.js";
+import repairReportRoutes from "./routes/repairReportRoutes.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/api/roles", roleRoutes);
 app.use("/api/role-permissions", rolePermissionRoutes);
 app.use("/api/ping", pingRoutes);
 app.use("/api/service-reports", serviceReportRoutes);
+app.use("/api/repair-reports", repairReportRoutes);
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = process.env.PORT || 4000;

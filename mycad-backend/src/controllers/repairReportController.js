@@ -1,15 +1,15 @@
 import { db } from "../lib/db.js";
 import { generateFolio } from "../utils/generateFolio.js";
-import { processUploadedFiles } from "../middleware/fileUploadMiddleware.js";
+import { processUploadedFiles } from "../middleware/fileUploadRepairMiddleware.js";
 
 // Obtener todos los reportes
-export const getServiceReports = async (req, res) => {
+export const getRepairReports = async (req, res) => {
   try {
-    const reports = await db.serviceHistory.findMany({
+    const reports = await db.repairReport.findMany({
       include: {
         vehicle: true,
         attachments: true,
-        replacedParts: true,
+        repairedParts: true,
       },
     });
 
@@ -18,12 +18,12 @@ export const getServiceReports = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ error: "Error al obtener los reportes de servicio" });
+      .json({ error: "Error al obtener los reportes de reparación" });
   }
 };
 
 // Obtener un reporte por ID
-export const getServiceReportById = async (req, res) => {
+export const getRepairReportById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -31,7 +31,7 @@ export const getServiceReportById = async (req, res) => {
       return res.status(400).json({ error: "ID de reporte requerido" });
     }
 
-    const report = await db.serviceHistory.findUnique({
+    const report = await db.repairReport.findUnique({
       where: { id },
       include: {
         vehicle: {
@@ -56,7 +56,7 @@ export const getServiceReportById = async (req, res) => {
           },
         },
         attachments: true,
-        replacedParts: true,
+        repairedParts: true,
       },
     });
 
@@ -67,44 +67,50 @@ export const getServiceReportById = async (req, res) => {
     res.status(200).json(report);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al obtener el reporte de servicio" });
+    res
+      .status(500)
+      .json({ error: "Error al obtener el reporte de reparación" });
   }
 };
 
-// Crear un nuevo reporte de servicio
-export const createServiceReport = async (req, res) => {
+// Crear un nuevo reporte de reparación
+export const createRepairReport = async (req, res) => {
   try {
     const {
       vehicleId,
-      reportType,
-      serviceDate,
+      repairDate,
       description,
       totalCost,
       comments,
-      replacedParts,
+      repairedParts,
+      workshopType,
+      workshopName,
+      workshopContact,
     } = req.body;
 
     // Generar el folio basado en el tipo de reporte
-    const folio = await generateFolio(reportType);
+    const folio = await generateFolio("REPAIR");
 
     // Procesar los adjuntos usando la función del middleware
     const attachments = req.files ? processUploadedFiles(req.files) : [];
 
     // Crear el reporte en la base de datos
-    const report = await db.serviceHistory.create({
+    const report = await db.repairReport.create({
       data: {
-        folio, // Agregar el folio generado
+        folio,
         vehicleId,
-        reportType,
-        serviceDate: new Date(serviceDate),
+        repairDate: new Date(repairDate),
         description,
         totalCost: parseFloat(totalCost),
         comments,
+        workshopType,
+        workshopName,
+        workshopContact,
         attachments: {
-          create: attachments, // Guardar las rutas procesadas de los archivos
+          create: attachments,
         },
-        replacedParts: {
-          create: JSON.parse(replacedParts || "[]").map((part) => ({
+        repairedParts: {
+          create: JSON.parse(repairedParts || "[]").map((part) => ({
             partName: part.partName,
             actionType: part.actionType,
             cost: parseFloat(part.cost),
@@ -113,7 +119,7 @@ export const createServiceReport = async (req, res) => {
       },
       include: {
         attachments: true,
-        replacedParts: true,
+        repairedParts: true,
         vehicle: {
           select: {
             plateNumber: true,
@@ -146,20 +152,21 @@ export const createServiceReport = async (req, res) => {
 };
 
 // Actualizar un reporte
-export const updateServiceReport = async (req, res) => {
+export const updateRepairReport = async (req, res) => {
   try {
     const { id } = req.params;
     const {
       description,
       totalCost,
       comments,
-      replacedParts,
-      reportType,
+      repairedParts,
       existingAttachments,
       vehicleId,
+      workshopType,
+      workshopName,
+      workshopContact,
     } = req.body;
 
-    // Parsear los adjuntos existentes
     const parsedExistingAttachments = existingAttachments
       ? JSON.parse(existingAttachments)
       : [];
@@ -168,41 +175,39 @@ export const updateServiceReport = async (req, res) => {
       (attachment) => attachment.id
     );
 
-    // Procesar nuevos adjuntos
     const newAttachments = req.files ? processUploadedFiles(req.files) : [];
 
-    // Eliminar archivos obsoletos si hay adjuntos válidos
     if (validAttachmentIds.length > 0) {
-      await db.servicesFile.deleteMany({
+      await db.repairFile.deleteMany({
         where: {
-          serviceId: id,
+          repairId: id,
           id: {
-            notIn: validAttachmentIds, // Mantener solo los adjuntos existentes
+            notIn: validAttachmentIds,
           },
         },
       });
     } else {
-      // Eliminar todos los adjuntos si no hay ninguno válido
-      await db.servicesFile.deleteMany({
-        where: { serviceId: id },
+      await db.repairFile.deleteMany({
+        where: { repairId: id },
       });
     }
 
-    // Actualizar el reporte en la base de datos
-    const updatedReport = await db.serviceHistory.update({
+    const updatedReport = await db.repairReport.update({
       where: { id },
       data: {
         description,
         vehicleId,
         totalCost: parseFloat(totalCost),
         comments,
-        reportType,
+        workshopType,
+        workshopName,
+        workshopContact,
         attachments: {
-          create: newAttachments, // Crear nuevos adjuntos
+          create: newAttachments,
         },
-        replacedParts: {
-          deleteMany: {}, // Eliminar todas las piezas reemplazadas existentes
-          create: JSON.parse(replacedParts || "[]").map((part) => ({
+        repairedParts: {
+          deleteMany: {},
+          create: JSON.parse(repairedParts || "[]").map((part) => ({
             partName: part.partName,
             actionType: part.actionType,
             cost: parseFloat(part.cost),
@@ -211,7 +216,7 @@ export const updateServiceReport = async (req, res) => {
       },
       include: {
         attachments: true,
-        replacedParts: true,
+        repairedParts: true,
         vehicle: {
           select: {
             plateNumber: true,
@@ -244,21 +249,20 @@ export const updateServiceReport = async (req, res) => {
 };
 
 // Eliminar un reporte (lógica)
-export const deleteServiceReport = async (req, res) => {
+export const deleteRepairReport = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Eliminación lógica del reporte
-    await db.serviceHistory.update({
+    await db.repairReport.update({
       where: { id },
       data: { enabled: false },
     });
 
-    const allServicesReports = await db.serviceHistory.findMany({
+    const allRepaitReports = await db.repairReport.findMany({
       where: { enabled: true },
       include: {
         attachments: true,
-        replacedParts: true,
+        repairedParts: true,
         vehicle: {
           select: {
             plateNumber: true,
@@ -285,116 +289,66 @@ export const deleteServiceReport = async (req, res) => {
 
     res.status(200).json({
       message: "Reporte eliminado correctamente",
-      data: allServicesReports,
+      data: allRepaitReports,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al eliminar el reporte de servicio" });
+    res
+      .status(500)
+      .json({ error: "Error al eliminar el reporte de reparación" });
   }
 };
 
-export const searchServiceReports = async (req, res) => {
+// Buscar reportes
+export const searchRepairReports = async (req, res) => {
   try {
-    const { search = "", type = "ALL", page = 1, limit = 10 } = req.query;
+    const { search = "", page = 1, limit = 10 } = req.query;
 
     const offset = (page - 1) * limit;
 
-    // Construir el filtro base
     const filters = {
-      enabled: true, // Filtrar solo reportes habilitados
+      enabled: true,
     };
 
-    // Filtro por tipo de reporte
-    if (type !== "ALL") {
-      filters.reportType = type;
+    if (search.trim()) {
+      filters.OR = [
+        { folio: { contains: search } },
+        { description: { contains: search } },
+        { comments: { contains: search } },
+        {
+          repairedParts: {
+            some: { partName: { contains: search } },
+          },
+        },
+        // Buscar por placa, marca, modelo o tipo de vehículo
+        {
+          vehicle: {
+            model: {
+              brand: { name: { contains: search } },
+              type: { name: { contains: search } },
+              name: { contains: search },
+            },
+            plateNumber: { contains: search },
+          },
+        },
+      ];
+
+      //   buscar por costo total, tipo de taller, nombre de taller o contacto de taller
+      filters.OR.push(
+        { totalCost: parseFloat(search) },
+        { workshopType: { contains: search } },
+        { workshopName: { contains: search } },
+        { workshopContact: { contains: search } }
+      );
     }
 
-    // Validar y construir el filtro de búsqueda
-    const trimmedSearch = search.trim();
-
-    if (trimmedSearch) {
-      filters.OR = [];
-
-      // Filtrar por placa del vehículo
-      filters.OR.push({
-        vehicle: {
-          plateNumber: {
-            contains: trimmedSearch,
-          },
-        },
-      });
-
-      // Filtrar por modelo del vehículo
-      filters.OR.push({
-        vehicle: {
-          model: {
-            name: {
-              contains: trimmedSearch,
-            },
-          },
-        },
-      });
-
-      // Filtrar por descripción del reporte
-      filters.OR.push({
-        description: {
-          contains: trimmedSearch,
-        },
-      });
-
-      // filtrar por folio
-      filters.OR.push({
-        folio: {
-          contains: trimmedSearch,
-        },
-      });
-
-      // Filtrar por comentarios
-      filters.OR.push({
-        comments: {
-          contains: trimmedSearch,
-        },
-      });
-
-      // Filtrar por partes reemplazadas
-      filters.OR.push({
-        replacedParts: {
-          some: {
-            partName: {
-              contains: trimmedSearch,
-            },
-          },
-        },
-      });
-
-      // Filtrar por costos (numéricos)
-      const numericSearch = parseFloat(trimmedSearch);
-      if (!isNaN(numericSearch)) {
-        filters.OR.push(
-          {
-            replacedParts: {
-              some: {
-                cost: {
-                  equals: numericSearch,
-                },
-              },
-            },
-          },
-          {
-            totalCost: {
-              equals: numericSearch,
-            },
-          }
-        );
-      }
-    }
-
-    // Consultar reportes en la base de datos
-    const reports = await db.serviceHistory.findMany({
+    const reports = await db.repairReport.findMany({
       where: filters,
       skip: parseInt(offset),
       take: parseInt(limit),
       include: {
+        attachments: true,
+        repairedParts: true,
         vehicle: {
           select: {
             plateNumber: true,
@@ -416,20 +370,12 @@ export const searchServiceReports = async (req, res) => {
             },
           },
         },
-        attachments: true, // Incluye archivos adjuntos
-        replacedParts: true, // Incluye partes reemplazadas
       },
-      orderBy: {
-        updatedAt: "desc", // Ordenar por fecha de servicio
-      },
+      orderBy: { repairDate: "desc" },
     });
 
-    // Contar el total de reportes que coinciden con los filtros
-    const totalReports = await db.serviceHistory.count({
-      where: filters,
-    });
+    const totalReports = await db.repairReport.count({ where: filters });
 
-    // Responder con los datos
     res.status(200).json({
       total: totalReports,
       page: parseInt(page),

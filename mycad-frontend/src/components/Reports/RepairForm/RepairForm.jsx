@@ -1,14 +1,14 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { FormikProvider, useFormik, Form } from 'formik';
-import { ServicesFormSchema } from './ServicesFormSchema';
-import ServicesFormFields from './ServicesFormFields';
+import { RepairFormSchema } from './RepairFormSchema';
+import RepairFormFields from './RepairFormFields';
 
-const ServicesForm = forwardRef(
+const RepairForm = forwardRef(
   ({ initialValues, onSubmit, vehicles, isUpdate = false }, ref) => {
     const formik = useFormik({
       enableReinitialize: true,
       initialValues: initialValues,
-      validationSchema: ServicesFormSchema,
+      validationSchema: RepairFormSchema,
       onSubmit: (values, actions) => {
         onSubmit(values, actions);
       },
@@ -23,18 +23,18 @@ const ServicesForm = forwardRef(
     return (
       <FormikProvider value={formik}>
         <Form ref={ref} onSubmit={formik.handleSubmit}>
-          <h2 className="text-xl font-bold">
-            Reporte de Mantenimiento o Servicio
-          </h2>
+          <h2 className="text-xl font-bold">Reporte de Reparación</h2>
           <p className="text-sm text-gray-500 mb-6">
-            Registra los detalles del mantenimiento o servicio realizado a un
-            vehículo.
+            Registra los detalles de la reparación realizada a un vehículo.
           </p>
-          <ServicesFormFields vehicles={vehicles} />
+          <RepairFormFields
+            vehicles={vehicles}
+            workshopType={initialValues?.workshopType}
+          />
         </Form>
       </FormikProvider>
     );
   },
 );
 
-export default ServicesForm;
+export default RepairForm;

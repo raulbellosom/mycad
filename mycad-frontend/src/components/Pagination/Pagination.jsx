@@ -1,6 +1,6 @@
 import React from 'react';
 import ActionButtons from '../ActionButtons/ActionButtons';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io';
 
 const Pagination = ({
   currentPage,
@@ -24,8 +24,8 @@ const Pagination = ({
         extraActions={[
           {
             action: () => handlePageChange(currentPage - 1),
-            color: 'neutral',
-            icon: FaChevronLeft,
+            color: 'black',
+            icon: IoMdArrowRoundBack,
           },
         ]}
       />
@@ -41,8 +41,8 @@ const Pagination = ({
         extraActions={[
           {
             action: () => handlePageChange(currentPage + 1),
-            color: 'neutral',
-            icon: FaChevronRight,
+            color: 'black',
+            icon: IoMdArrowRoundForward,
           },
         ]}
       />

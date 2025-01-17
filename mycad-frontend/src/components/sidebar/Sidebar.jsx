@@ -14,6 +14,7 @@ import {
   FaSignOutAlt,
   FaUserCog,
   FaUserShield,
+  FaToolbox,
 } from 'react-icons/fa';
 import { useAuthContext } from '../../context/AuthContext';
 import AccountSidebar from './AccountSidebar';
@@ -301,7 +302,7 @@ const Sidebar = ({ children }) => {
                   Servicios
                 </MenuItem>
                 <MenuItem
-                  icon={<MdAdminPanelSettings size={23} />}
+                  icon={<FaToolbox size={23} />}
                   active={isActivePath('/reports/repairs')}
                   component={<Link to={'/reports/repairs'} />}
                   onClick={() => {

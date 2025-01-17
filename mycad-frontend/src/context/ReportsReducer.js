@@ -57,7 +57,7 @@ const reportsReducer = (state, action) => {
     case REPORTS_ACTIONS.DELETE_REPORT:
       return {
         ...state,
-        reports: state.reports.filter((report) => report.id !== action.payload),
+        reports: action.payload,
       };
     case REPORTS_ACTIONS.SET_FILTERS:
       return {
