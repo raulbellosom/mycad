@@ -19,6 +19,7 @@ const RepairReportsProvider = ({ children }) => {
     queryFn: () =>
       searchRepairReports({
         search: state.filters.search,
+        type: state.filters.type,
         page: state.pagination.page,
         limit: state.pagination.limit,
       }),
@@ -28,7 +29,7 @@ const RepairReportsProvider = ({ children }) => {
   useEffect(() => {
     if (isSuccess && data) {
       dispatch({
-        type: REPAIR_REPORTS_ACTIONS.SET_REPORTS,
+        type: REPAIR_REPORTS_ACTIONS.SET_REPAIR_REPORTS,
         payload: data.data,
       });
       dispatch({

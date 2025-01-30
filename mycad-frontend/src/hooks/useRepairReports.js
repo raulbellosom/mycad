@@ -83,6 +83,7 @@ export const useRepairReports = () => {
     queryFn: () =>
       searchRepairReports({
         search: state.filters.search,
+        type: state.filters.type,
         page: state.pagination.page,
         limit: state.pagination.limit,
       }),

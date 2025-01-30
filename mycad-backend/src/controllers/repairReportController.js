@@ -79,6 +79,8 @@ export const createRepairReport = async (req, res) => {
     const {
       vehicleId,
       repairDate,
+      failureDate,
+      startRepairDate,
       description,
       totalCost,
       comments,
@@ -99,6 +101,8 @@ export const createRepairReport = async (req, res) => {
       data: {
         folio,
         vehicleId,
+        failureDate: new Date(failureDate),
+        startRepairDate: new Date(startRepairDate),
         repairDate: new Date(repairDate),
         description,
         totalCost: parseFloat(totalCost),
@@ -158,6 +162,9 @@ export const updateRepairReport = async (req, res) => {
     const {
       description,
       totalCost,
+      startRepairDate,
+      repairDate,
+      failureDate,
       comments,
       repairedParts,
       existingAttachments,
@@ -197,6 +204,9 @@ export const updateRepairReport = async (req, res) => {
       data: {
         description,
         vehicleId,
+        failureDate: new Date(failureDate),
+        startRepairDate: new Date(startRepairDate),
+        repairDate: new Date(repairDate),
         totalCost: parseFloat(totalCost),
         comments,
         workshopType,

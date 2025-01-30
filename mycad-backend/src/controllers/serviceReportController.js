@@ -78,6 +78,9 @@ export const createServiceReport = async (req, res) => {
       vehicleId,
       reportType,
       serviceDate,
+      endServiceDate,
+      serviceProviderName,
+      serviceContactInfo,
       description,
       totalCost,
       comments,
@@ -97,6 +100,9 @@ export const createServiceReport = async (req, res) => {
         vehicleId,
         reportType,
         serviceDate: new Date(serviceDate),
+        endServiceDate: endServiceDate ? new Date(endServiceDate) : null,
+        serviceProviderName,
+        serviceContactInfo,
         description,
         totalCost: parseFloat(totalCost),
         comments,
@@ -150,6 +156,10 @@ export const updateServiceReport = async (req, res) => {
   try {
     const { id } = req.params;
     const {
+      serviceDate,
+      endServiceDate,
+      serviceProviderName,
+      serviceContactInfo,
       description,
       totalCost,
       comments,
@@ -192,6 +202,10 @@ export const updateServiceReport = async (req, res) => {
     const updatedReport = await db.serviceHistory.update({
       where: { id },
       data: {
+        serviceDate: new Date(serviceDate),
+        endServiceDate: endServiceDate ? new Date(endServiceDate) : null,
+        serviceProviderName,
+        serviceContactInfo,
         description,
         vehicleId,
         totalCost: parseFloat(totalCost),

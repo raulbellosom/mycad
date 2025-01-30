@@ -10,6 +10,9 @@ export const createServiceReport = async (data) => {
     formData.append('vehicleId', data.vehicleId);
     formData.append('reportType', data.reportType);
     formData.append('serviceDate', data.serviceDate);
+    formData.append('endServiceDate', data.endServiceDate);
+    formData.append('serviceProviderName', data.serviceProviderName);
+    formData.append('serviceContactInfo', data.serviceContactInfo);
     formData.append('description', data.description);
     formData.append('totalCost', data.totalCost);
     formData.append('comments', data.comments || '');
@@ -59,6 +62,9 @@ export const updateServiceReport = async (object) => {
     formData.append('vehicleId', data.vehicleId);
     formData.append('reportType', data.reportType);
     formData.append('serviceDate', data.serviceDate);
+    formData.append('endServiceDate', data.endServiceDate);
+    formData.append('serviceProviderName', data.serviceProviderName);
+    formData.append('serviceContactInfo', data.serviceContactInfo);
     formData.append('description', data.description);
     formData.append('totalCost', data.totalCost);
     formData.append('comments', data.comments || '');
@@ -150,6 +156,8 @@ export const createRepairReport = async (data) => {
 
     // Agregar los datos al FormData
     formData.append('vehicleId', data.vehicleId);
+    formData.append('failureDate', data.failureDate);
+    formData.append('startRepairDate', data.startRepairDate);
     formData.append('repairDate', data.repairDate);
     formData.append('description', data.description);
     formData.append('totalCost', data.totalCost);
@@ -206,6 +214,8 @@ export const updateRepairReport = async (object) => {
     // Agregar datos al FormData
     formData.append('vehicleId', data.vehicleId);
     formData.append('repairDate', data.repairDate);
+    formData.append('failureDate', data.failureDate);
+    formData.append('startRepairDate', data.startRepairDate);
     formData.append('description', data.description);
     formData.append('totalCost', data.totalCost);
     formData.append('comments', data.comments || '');
@@ -270,12 +280,13 @@ export const deleteRepairReport = async (id) => {
 // Buscar reportes de reparación
 export const searchRepairReports = async ({
   search = '',
+  type = 'ALL',
   page = 1,
   limit = 10,
 }) => {
   try {
     const response = await api.get('/repair-reports/search', {
-      params: { search, page, limit },
+      params: { search, type, page, limit },
     });
     return response.data;
   } catch (error) {

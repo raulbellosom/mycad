@@ -32,7 +32,40 @@ const BreadcrumbsBuilder = (path) => {
       href: '/vehicles/view',
       icon: MdChecklist,
     },
+    // service report breadcrumbs
 
+    {
+      label: 'Reportes de Servicio',
+      href: '/reports/services',
+    },
+    {
+      label: 'Crear Reporte de Servicio',
+      href: '/reports/services/create',
+    },
+    {
+      label: 'Editar Reporte de Servicio',
+      href: '/reports/services/edit',
+    },
+    {
+      label: 'Detalles del Reporte de Servicio',
+      href: '/reports/services/view',
+    },
+    {
+      label: 'Reporte de Reparacion',
+      href: '/reports/repairs',
+    },
+    {
+      label: 'Crear Reporte de Reparacion',
+      href: '/reports/repairs/create',
+    },
+    {
+      label: 'Editar Reporte de Reparacion',
+      href: '/reports/repairs/edit',
+    },
+    {
+      label: 'Detalles de la Reporte de Reparacion',
+      href: '/reports/repairs/view',
+    },
     {
       label: 'Catalogos',
       href: '/catalogs',

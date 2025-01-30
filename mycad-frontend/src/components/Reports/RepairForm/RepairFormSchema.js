@@ -2,6 +2,8 @@ import * as Yup from 'yup';
 
 export const RepairFormSchema = Yup.object({
   vehicleId: Yup.string().required('El vehículo es obligatorio'),
+  failureDate: Yup.date().required('La fecha de falla es obligatoria'),
+  startRepairDate: Yup.date().required('La fecha de inicio es obligatoria'),
   repairDate: Yup.date().required('La fecha de reparación es obligatoria'),
   description: Yup.string().required('La descripción es obligatoria'),
   totalCost: Yup.number()
@@ -10,22 +12,9 @@ export const RepairFormSchema = Yup.object({
   comments: Yup.string().nullable(),
   workshopType: Yup.string()
     .required('El tipo de taller es obligatorio')
-    .oneOf(['INTERNAL', 'EXTERNAL'], 'El tipo de taller no es válido'),
-  workshopName: Yup.string()
-    .nullable()
-    .when('workshopType', {
-      is: 'EXTERNAL',
-      then: Yup.string().required('El nombre del taller es obligatorio'),
-    }),
-  workshopContact: Yup.string()
-    .nullable()
-    .when('workshopType', {
-      is: 'EXTERNAL',
-      then: Yup.string().required(
-        'El contacto del taller es obligatorio para talleres externos',
-      ),
-      otherwise: Yup.string().nullable(),
-    }),
+    .oneOf(['IN_HOUSE', 'EXTERNAL'], 'El tipo de taller no es válido'),
+  workshopName: Yup.string().nullable(), // Opcional
+  workshopContact: Yup.string().nullable(), // Opcional
   repairedParts: Yup.array()
     .of(
       Yup.object({

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { MdMiscellaneousServices } from 'react-icons/md';
+import { MdBuild } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
-import { useReports } from '../../../hooks/useReports';
+import { useRepairReports } from '../../../hooks/useRepairReports';
 import ActionButtons from '../../../components/ActionButtons/ActionButtons';
 import {
   FaCalendarAlt,
@@ -9,6 +9,8 @@ import {
   FaCarSide,
   FaFilePdf,
   FaPen,
+  FaPhone,
+  FaTools,
 } from 'react-icons/fa';
 import Logo from '../../../assets/logo/myc_logo.png';
 import { parseToCurrency } from '../../../utils/formatValues';
@@ -18,35 +20,37 @@ import { AiOutlineFieldNumber } from 'react-icons/ai';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { BiSolidCarGarage, BiSolidContact } from 'react-icons/bi';
+import { FaCalendarXmark } from 'react-icons/fa6';
 
-const ViewServicesReport = () => {
+const ViewRepairReport = () => {
   const { id } = useParams();
-  const { fetchReportById, state } = useReports();
-  const [report, setReport] = useState({});
+  const { fetchRepairReportById, state } = useRepairReports();
+  const [repairReport, setRepairReport] = useState({});
 
   useEffect(() => {
     if (id) {
-      fetchReportById(id);
+      fetchRepairReportById(id);
     }
   }, [id]);
 
   useEffect(() => {
-    if (state.report && state.report.vehicleId) {
-      const parseAttachments = state.report.attachments.map((attachment) => ({
-        id: attachment.id,
-        url: attachment.url,
-        type: attachment.type,
-        name:
-          JSON?.parse(attachment?.metadata)?.originalName ||
-          'Archivo desconocido',
-      }));
-      setReport({
-        ...state.report,
+    if (state.repairReport && state.repairReport.vehicleId) {
+      const parseAttachments = state.repairReport.attachments.map(
+        (attachment) => ({
+          id: attachment.id,
+          url: attachment.url,
+          type: attachment.type,
+          name:
+            JSON?.parse(attachment?.metadata)?.originalName ||
+            'Archivo desconocido',
+        }),
+      );
+      setRepairReport({
+        ...state.repairReport,
         attachments: parseAttachments,
       });
     }
-  }, [state.report]);
+  }, [state.repairReport]);
 
   const exportToPDF = async () => {
     const element = document.getElementById('pdf-container'); // ID del contenedor
@@ -67,7 +71,7 @@ const ViewServicesReport = () => {
     pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
 
     // Descarga el PDF
-    pdf.save(`Reporte_${report.folio || 'sin_folio'}.pdf`);
+    pdf.save(`Reporte_${repairReport.folio || 'sin_folio'}.pdf`);
   };
 
   return (
@@ -75,18 +79,15 @@ const ViewServicesReport = () => {
       {/* Encabezado */}
       <div className="flex flex-col-reverse md:flex-row items-center gap-4 w-full pb-4">
         <div className="w-full h-full flex items-center text-orange-500">
-          <MdMiscellaneousServices size={24} className="mr-4" />
-          <h1 className="md:text-2xl font-bold">
-            Reporte de{' '}
-            {report.reportType === 'PREVENTIVE' ? 'Mantenimiento' : 'Servicio'}
-          </h1>
+          <MdBuild size={24} className="mr-4" />
+          <h1 className="md:text-2xl font-bold">Reporte de Reparación</h1>
         </div>
         <div className="flex w-full md:w-auto gap-2">
           <ActionButtons
             extraActions={[
               {
                 label: 'Regresar',
-                href: '/reports/services',
+                href: '/reports/repairs',
                 color: 'black',
                 icon: IoMdArrowRoundBack,
               },
@@ -98,7 +99,7 @@ const ViewServicesReport = () => {
               },
               {
                 label: 'Editar',
-                href: `/reports/services/edit/${id}`,
+                href: `/reports/repairs/edit/${id}`,
                 icon: FaPen,
                 color: 'mycad',
                 filled: true,
@@ -113,7 +114,7 @@ const ViewServicesReport = () => {
         id="pdf-container"
         className="mt-2 w-full max-w-4xl flex justify-center flex-col gap-2 mx-auto border p-2 md:p-8 rounded-lg"
       >
-        <div className="flex flex-col  md:flex-row justify-between md:items-center gap-4">
+        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
           <div className="flex justify-center md:justify-start md:mb-2">
             <img
               src={Logo}
@@ -122,14 +123,9 @@ const ViewServicesReport = () => {
             />
           </div>
           <div className="text-center">
-            <h2 className="md:text-xl font-bold">
-              Detalles del{' '}
-              {report.reportType === 'PREVENTIVE'
-                ? 'mantenimiento'
-                : 'servicio'}
-            </h2>
+            <h2 className="md:text-xl font-bold">Detalles de la reparación</h2>
             <p className="text-xs md:text-sm text-gray-500">
-              Detalles del mantenimiento o servicio realizado al vehículo
+              Detalles de la reparación realizada al vehículo
             </p>
           </div>
           <div className="flex flex-col gap-2 col-span-6 md:col-span-3">
@@ -138,103 +134,132 @@ const ViewServicesReport = () => {
               <span className="inline-block">
                 <AiOutlineFieldNumber size={20} />
               </span>
-              {report.folio || 'No disponible'}
+              {repairReport.folio || 'No disponible'}
             </p>
           </div>
         </div>
-        {report ? (
+        {repairReport ? (
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-12 gap-4 w-full">
-              <div className="flex flex-col gap-2 col-span-12 md:col-span-6">
+              <div className="flex flex-col gap-2 col-span-12">
                 <h3 className="text-gray-700 font-bold text-sm">Vehículo</h3>
                 <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
                   <span className="inline-block">
                     <FaCarSide size={20} />
                   </span>
-                  {`(${report.vehicle?.model?.year || 'No disponible'}) ${report.vehicle?.model?.name} [${report.vehicle?.model?.brand?.name} / ${report.vehicle?.model?.type?.name}]`}
+                  {`(${repairReport.vehicle?.model?.year || 'No disponible'}) ${
+                    repairReport.vehicle?.model?.name
+                  } [${repairReport.vehicle?.model?.brand?.name} / ${
+                    repairReport.vehicle?.model?.type?.name
+                  }]`}
                 </p>
               </div>
-              <div className="flex flex-col gap-2 col-span-6 md:col-span-3">
+            </div>
+            <div className="grid grid-cols-12 gap-4 w-full">
+              <div className="flex flex-col gap-2 col-span-12 md:col-span-4">
                 <h3 className="text-gray-700 font-bold text-sm">
-                  Inicio del servicio
+                  F. de falla del vehículo.
+                </h3>
+                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
+                  <span className="inline-block">
+                    <FaCalendarXmark size={20} />
+                  </span>
+                  {new Date(repairReport?.failureDate).toLocaleDateString(
+                    'es-MX',
+                  )}
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 col-span-6 md:col-span-4">
+                <h3 className="text-gray-700 font-bold text-sm">
+                  F. Inicio de reparación.
                 </h3>
                 <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
                   <span className="inline-block">
                     <FaCalendarAlt size={20} />
                   </span>
-                  {new Date(report.serviceDate).toLocaleDateString('es-MX')}
+                  {new Date(repairReport.startRepairDate).toLocaleDateString(
+                    'es-MX',
+                  )}
                 </p>
               </div>
-              <div className="flex flex-col gap-2 col-span-6 md:col-span-3">
+              <div className="flex flex-col gap-2 col-span-6 md:col-span-4">
                 <h3 className="text-gray-700 font-bold text-sm">
-                  Fin del servicio
+                  F. Fin de reparación
                 </h3>
-                <p className="bg-gray-50  p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
+                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
                   <span className="inline-block">
                     <FaCalendarCheck size={20} />
                   </span>
-                  {new Date(report.endServiceDate).toLocaleDateString(
-                    'es-MX',
-                  ) || 'No disponible'}
+                  {new Date(repairReport.repairDate).toLocaleDateString()}
                 </p>
               </div>
             </div>
-
-            <div className="flex flex-col md:flex-row w-full gap-2">
-              <div className="flex flex-col gap-2 w-full">
-                <h3 className="text-gray-700 font-bold text-sm">
-                  Proveedor del{' '}
-                  {report.reportType === 'PREVENTIVE'
-                    ? 'mantenimiento'
-                    : 'servicio'}
-                </h3>
+            {/* workshop */}
+            {repairReport.workshopType === 'IN_HOUSE' ? (
+              <div className="flex flex-col gap-2">
+                <h3 className="text-gray-700 font-bold text-sm">Taller</h3>
                 <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
                   <span className="inline-block">
-                    <BiSolidCarGarage size={20} />
+                    <FaTools size={20} />
                   </span>
-                  {report.serviceProviderName || 'No disponible'}
+                  {`Taller interno`}
                 </p>
               </div>
-              <div className="flex flex-col gap-2 w-full">
-                <h3 className="text-gray-700 font-bold text-sm">
-                  Contacto del proveedor
-                </h3>
-                <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
-                  <span className="inline-block">
-                    <BiSolidContact size={20} />
-                  </span>
-                  {report.serviceContactInfo || 'No disponible'}
-                </p>
+            ) : (
+              <div className="grid grid-cols-12 gap-4 w-full">
+                <div className="flex flex-col gap-2 col-span-12 md:col-span-6">
+                  <h3 className="text-gray-700 font-bold text-sm">
+                    Nombre del taller
+                  </h3>
+                  <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
+                    <span className="inline-block">
+                      <FaTools size={20} />
+                    </span>
+                    {repairReport.workshopName || 'No disponible'}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 col-span-12 md:col-span-6">
+                  <h3 className="text-gray-700 font-bold text-sm">
+                    Contacto del taller
+                  </h3>
+                  <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-xs md:text-base">
+                    <span className="inline-block">
+                      <FaPhone size={20} />
+                    </span>
+                    {repairReport.workshopContact || 'No disponible'}
+                  </p>
+                </div>
               </div>
-            </div>
-
+            )}
             <div>
               <h3 className="text-gray-700 font-bold text-sm mb-2">
                 Descripción
               </h3>
               <p className="bg-gray-50 min-h-16 p-3 rounded-lg text-sm md:text-base">
-                {report.description || 'No disponible'}
+                {repairReport.description || 'No disponible'}
               </p>
             </div>
             <div className="flex flex-col gap-2">
-              <h3 className="text-gray-700 font-bold text-sm b">Costo total</h3>
+              <h3 className="text-gray-700 font-bold text-sm">Costo total</h3>
               <p className="bg-gray-50 p-3 rounded-md flex items-center gap-4 text-sm md:text-base">
                 <span className="inline-block">
                   <RiMoneyDollarCircleFill size={20} />
                 </span>
-                {report.totalCost !== undefined && report.totalCost !== null
-                  ? parseToCurrency(report.totalCost, 'MXN')
+                {repairReport.totalCost !== undefined &&
+                repairReport.totalCost !== null
+                  ? parseToCurrency(repairReport.totalCost, 'MXN')
                   : 'No disponible'}
               </p>
             </div>
-            {/* Partes reparadas o reemplazadas */}
+            {/* Partes reparadas */}
             <div className="flex flex-col gap-4 mt-2">
               <h3 className="text-gray-700 font-bold text-sm mb-2">
-                Partes reemplazadas o reparadas
+                Partes reparadas o reemplazadas
               </h3>
-              {report.replacedParts && report.replacedParts.length > 0 ? (
+              {repairReport.repairedParts &&
+              repairReport.repairedParts.length > 0 ? (
                 <ul className="space-y-2">
-                  {report.replacedParts.map((part, index) => (
+                  {repairReport.repairedParts.map((part, index) => (
                     <li
                       key={index}
                       className="flex justify-between items-start bg-gray-50 p-3 rounded-md"
@@ -244,7 +269,11 @@ const ViewServicesReport = () => {
                           {part.partName || 'Sin nombre'}
                         </p>
                         <span
-                          className={`text-xs text-white py-1 px-2 w-fit rounded-full ${part.actionType === 'REPLACED' ? 'bg-mycad-secondary' : 'bg-mycad-warning'}`}
+                          className={`text-xs text-white py-1 px-2 w-fit rounded-full ${
+                            part.actionType === 'REPLACED'
+                              ? 'bg-mycad-secondary'
+                              : 'bg-mycad-warning'
+                          }`}
                         >
                           {part.actionType === 'REPLACED' ? (
                             <span>Reemplazada</span>
@@ -272,7 +301,7 @@ const ViewServicesReport = () => {
                 Comentarios adicionales
               </h3>
               <p className="bg-gray-50 min-h-16 p-3 rounded-lg text-sm md:text-base">
-                {report.comments || 'No hay comentarios adicionales.'}
+                {repairReport.comments || 'No hay comentarios adicionales.'}
               </p>
             </div>
 
@@ -281,8 +310,9 @@ const ViewServicesReport = () => {
               <h3 className="text-gray-700 font-bold text-sm mb-2">
                 Archivos adjuntos al reporte
               </h3>
-              {report.attachments && report.attachments.length > 0 ? (
-                report.attachments.map((file, index) => (
+              {repairReport.attachments &&
+              repairReport.attachments.length > 0 ? (
+                repairReport.attachments.map((file, index) => (
                   <FileIcon key={index} file={file} />
                 ))
               ) : (
@@ -298,4 +328,4 @@ const ViewServicesReport = () => {
   );
 };
 
-export default ViewServicesReport;
+export default ViewRepairReport;
