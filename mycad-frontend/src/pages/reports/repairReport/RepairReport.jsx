@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MdBuild } from 'react-icons/md'; // Cambié el ícono para diferenciarlo
 import { IoMdAdd } from 'react-icons/io';
-import { FaTrashAlt, FaEye, FaRegFile, FaPen } from 'react-icons/fa';
+import { FaTrashAlt, FaEye, FaRegFile, FaPen, FaToolbox } from 'react-icons/fa';
 import TableHeader from '../../../components/Table/TableHeader';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '../../../components/Pagination/Pagination';
@@ -99,7 +99,7 @@ const RepairReports = () => {
       <section className="flex flex-col gap-4 bg-white shadow-md rounded-md dark:bg-neutral-900 p-4 antialiased">
         {/* Header */}
         <TableHeader
-          icon={MdBuild} // Cambiado el ícono
+          icon={FaToolbox} // Cambiado el ícono
           title="Reportes de Reparación"
           actions={[
             {
@@ -116,7 +116,7 @@ const RepairReports = () => {
         <div className="flex flex-col md:flex-row justify-between gap-4 pb-4">
           <input
             type="search"
-            placeholder="Buscar por vehículo o taller"
+            placeholder="Buscar por vehículo, taller, costo, descripción..."
             value={search}
             onChange={handleSearch}
             className="w-full md:w-1/2 rounded-md px-4 py-2"
@@ -128,7 +128,7 @@ const RepairReports = () => {
             <Dropdown.Item onClick={() => handleTypeFilter('EXTERNAL')}>
               Externo
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleTypeFilter('INTERNAL')}>
+            <Dropdown.Item onClick={() => handleTypeFilter('IN_HOUSE')}>
               Propio
             </Dropdown.Item>
           </Dropdown>
@@ -218,6 +218,44 @@ const RepairReports = () => {
                 <th
                   className={classNames(
                     'px-4 py-2 text-left cursor-pointer',
+                    sortConfig.key === 'failureDate'
+                      ? 'bg-mycad-primary text-white transition-all ease-in-out duration-200'
+                      : '',
+                  )}
+                  onClick={() => handleSort('failureDate')}
+                >
+                  <div className="flex items-center gap-2">
+                    {sortConfig.key === 'failureDate' &&
+                      (sortConfig.direction === 'asc' ? (
+                        <HiSortAscending size={'1.3rem'} />
+                      ) : (
+                        <HiSortDescending size={'1.3rem'} />
+                      ))}
+                    <p>F. Falla</p>
+                  </div>
+                </th>
+                <th
+                  className={classNames(
+                    'px-4 py-2 text-left cursor-pointer',
+                    sortConfig.key === 'startRepairDate'
+                      ? 'bg-mycad-primary text-white transition-all ease-in-out duration-200'
+                      : '',
+                  )}
+                  onClick={() => handleSort('startRepairDate')}
+                >
+                  <div className="flex items-center gap-2">
+                    {sortConfig.key === 'startRepairDate' &&
+                      (sortConfig.direction === 'asc' ? (
+                        <HiSortAscending size={'1.3rem'} />
+                      ) : (
+                        <HiSortDescending size={'1.3rem'} />
+                      ))}
+                    <p>F. Inicio</p>
+                  </div>
+                </th>
+                <th
+                  className={classNames(
+                    'px-4 py-2 text-left cursor-pointer',
                     sortConfig.key === 'repairDate'
                       ? 'bg-mycad-primary text-white transition-all ease-in-out duration-200'
                       : '',
@@ -231,7 +269,7 @@ const RepairReports = () => {
                       ) : (
                         <HiSortDescending size={'1.3rem'} />
                       ))}
-                    <p>Fecha</p>
+                    <p>F. Fin</p>
                   </div>
                 </th>
                 <th
@@ -341,17 +379,25 @@ const RepairReports = () => {
                     <td className="px-4 py-2">
                       <span
                         className={`px-2 py-1 rounded-full text-white ${
-                          report.workshopType === 'INTERNAL'
-                            ? 'bg-mycad-info'
-                            : 'bg-mycad-warning'
+                          report.workshopType === 'IN_HOUSE'
+                            ? 'bg-mycad-success'
+                            : 'bg-mycad-primary'
                         }`}
                       >
-                        {report.workshopType === 'INTERNAL'
+                        {report.workshopType === 'IN_HOUSE'
                           ? 'Taller Propio'
                           : 'Taller Externo'}
                       </span>
                     </td>
                     <td className="px-4 py-2">{report.workshopName}</td>
+                    <td className="px-4 py-2">
+                      {new Date(report.failureDate).toLocaleDateString('es-MX')}
+                    </td>
+                    <td className="px-4 py-2">
+                      {new Date(report.startRepairDate).toLocaleDateString(
+                        'es-MX',
+                      )}
+                    </td>
                     <td className="px-4 py-2">
                       {new Date(report.repairDate).toLocaleDateString('es-MX')}
                     </td>

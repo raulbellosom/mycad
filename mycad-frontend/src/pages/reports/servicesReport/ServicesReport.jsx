@@ -116,7 +116,7 @@ const ServicesReport = () => {
         <div className="flex flex-col md:flex-row justify-between gap-4 pb-4">
           <input
             type="search"
-            placeholder="Buscar por vehículo"
+            placeholder="Buscar por vehículo, costo, descripción..."
             value={search}
             onChange={handleSearch}
             className="w-full md:w-1/2 rounded-md px-4 py-2"
@@ -237,6 +237,25 @@ const ServicesReport = () => {
                 <th
                   className={classNames(
                     'px-4 py-2 text-left cursor-pointer',
+                    sortConfig.key === 'serviceProviderName'
+                      ? 'bg-mycad-primary text-white transition-all ease-in-out duration-200'
+                      : '',
+                  )}
+                  onClick={() => handleSort('serviceProviderName')}
+                >
+                  <div className="flex items-center gap-2">
+                    {sortConfig.key === 'serviceProviderName' &&
+                      (sortConfig.direction === 'asc' ? (
+                        <HiSortAscending size={'1.3rem'} />
+                      ) : (
+                        <HiSortDescending size={'1.3rem'} />
+                      ))}
+                    <p>Proovedor del servicio</p>
+                  </div>
+                </th>
+                <th
+                  className={classNames(
+                    'px-4 py-2 text-left cursor-pointer',
                     sortConfig.key === 'totalCost'
                       ? 'bg-mycad-primary text-white transition-all ease-in-out duration-200'
                       : '',
@@ -341,6 +360,7 @@ const ServicesReport = () => {
                         ? report.description?.substring(0, 75) + '...'
                         : report.description}
                     </td>
+                    <td className="px-4 py-2">{report.serviceProviderName}</td>
                     <td className="px-4 py-2 text-right">
                       ${report.totalCost.toFixed(2)}
                     </td>

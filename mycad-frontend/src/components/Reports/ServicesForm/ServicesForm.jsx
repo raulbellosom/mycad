@@ -22,7 +22,11 @@ const ServicesForm = forwardRef(
 
     return (
       <FormikProvider value={formik}>
-        <Form ref={ref} onSubmit={formik.handleSubmit}>
+        <Form
+          className="w-full max-w-3xl mx-auto"
+          ref={ref}
+          onSubmit={formik.handleSubmit}
+        >
           <h2 className="text-xl font-bold">
             Reporte de Mantenimiento o Servicio
           </h2>
@@ -30,7 +34,9 @@ const ServicesForm = forwardRef(
             Registra los detalles del mantenimiento o servicio realizado a un
             vehículo.
           </p>
-          <ServicesFormFields vehicles={vehicles} />
+          <div className="border border-gray-200 rounded-lg p-3 md:p-6 w-full">
+            <ServicesFormFields vehicles={vehicles} />
+          </div>
         </Form>
       </FormikProvider>
     );

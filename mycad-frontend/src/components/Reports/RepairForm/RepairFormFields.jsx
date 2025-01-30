@@ -1,5 +1,5 @@
 import React from 'react';
-import { Field, FieldArray } from 'formik';
+import { Field, FieldArray, useFormikContext } from 'formik';
 import TextInput from '../../Inputs/TextInput';
 import TextArea from '../../Inputs/TextArea';
 import FileInput from '../../Inputs/FileInput';
@@ -7,10 +7,10 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import SingleSelectInput from '../../Inputs/SingleSelectInput';
 import { IoMdAddCircleOutline } from 'react-icons/io';
 
-const RepairFormFields = ({ vehicles, workshopType }) => {
-  console.log(workshopType);
+const RepairFormFields = ({ vehicles }) => {
+  const { values } = useFormikContext();
   return (
-    <div className="space-y-6 pb-10">
+    <div className="pb-10 flex flex-col gap-4">
       {/* Selección de Vehículo */}
       <div>
         <Field
@@ -27,15 +27,37 @@ const RepairFormFields = ({ vehicles, workshopType }) => {
       </div>
 
       {/* Fecha de Reparación */}
-      <div>
-        <Field
-          name="repairDate"
-          id="repairDate"
-          component={TextInput}
-          label="Fecha de reparación"
-          type="date"
-          className="w-full"
-        />
+      <div className="grid md:grid-cols-3 gap-4">
+        <div>
+          <Field
+            name="failureDate"
+            id="failureDate"
+            component={TextInput}
+            label="Fecha de falla"
+            type="date"
+            className="w-full"
+          />
+        </div>
+        <div>
+          <Field
+            name="startRepairDate"
+            id="startRepairDate"
+            component={TextInput}
+            label="Fecha de inicio de reparación"
+            type="date"
+            className="w-full"
+          />
+        </div>
+        <div>
+          <Field
+            name="repairDate"
+            id="repairDate"
+            component={TextInput}
+            label="Fecha fin de reparación"
+            type="date"
+            className="w-full"
+          />
+        </div>
       </div>
 
       {/* Tipo de Taller */}
@@ -49,7 +71,7 @@ const RepairFormFields = ({ vehicles, workshopType }) => {
             <Field
               type="radio"
               name="workshopType"
-              value="INTERNAL"
+              value="IN_HOUSE"
               className="h-4 w-4"
             />
             <span className="text-sm">Taller propio</span>
@@ -66,7 +88,7 @@ const RepairFormFields = ({ vehicles, workshopType }) => {
         </div>
       </div>
 
-      {workshopType == 'INTERNAL' ? (
+      {values.workshopType === 'EXTERNAL' && (
         <>
           <div>
             <Field
@@ -74,7 +96,7 @@ const RepairFormFields = ({ vehicles, workshopType }) => {
               id="workshopName"
               component={TextInput}
               label="Nombre del taller"
-              placeholder="Ingrese el nombre del mecanico"
+              placeholder="Ingrese el nombre del mecánico"
               className="w-full"
             />
           </div>
@@ -89,30 +111,8 @@ const RepairFormFields = ({ vehicles, workshopType }) => {
             />
           </div>
         </>
-      ) : (
-        <>
-          <div>
-            <Field
-              name="workshopName"
-              id="workshopName"
-              component={TextInput}
-              label="Nombre del taller"
-              placeholder="Ingrese el nombre del taller"
-              className="w-full"
-            />
-          </div>
-          <div>
-            <Field
-              name="workshopContact"
-              id="workshopContact"
-              component={TextInput}
-              label="Contacto del taller"
-              placeholder="Ingrese el contacto del taller"
-              className="w-full"
-            />
-          </div>
-        </>
       )}
+
       {/* Descripción */}
       <div>
         <Field
@@ -141,7 +141,7 @@ const RepairFormFields = ({ vehicles, workshopType }) => {
 
       {/* Partes Reparadas */}
       <div className="flex flex-col gap-4 relative pt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-12 md:mb-1">
           Partes reparadas o reemplazadas
         </label>
         <FieldArray name="repairedParts">
@@ -150,7 +150,7 @@ const RepairFormFields = ({ vehicles, workshopType }) => {
               <button
                 type="button"
                 onClick={() => push({ partName: '', actionType: '', cost: 0 })}
-                className="text-blue-500 hover:text-white hover:bg-blue-500 transition-all ease-in-out duration-200 text-sm border p-2 rounded-md absolute right-2 top-1"
+                className="text-blue-500 hover:text-white hover:bg-blue-500 transition-all ease-in-out duration-200 text-sm border p-2 rounded-md absolute right-0 md:right-2 top-12 md:top-1"
               >
                 <IoMdAddCircleOutline
                   size={'1.2rem'}

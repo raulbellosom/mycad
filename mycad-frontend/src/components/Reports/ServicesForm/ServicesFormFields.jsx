@@ -9,7 +9,7 @@ import { IoMdAddCircleOutline } from 'react-icons/io';
 
 const ServicesFormFields = ({ vehicles }) => {
   return (
-    <div className="space-y-6 pb-10">
+    <div className="pb-10 flex flex-col gap-4">
       {/* Selección de Vehículo */}
       <div>
         <Field
@@ -53,15 +53,52 @@ const ServicesFormFields = ({ vehicles }) => {
       </div>
 
       {/* Fecha del Servicio */}
-      <div>
-        <Field
-          name="serviceDate"
-          id="serviceDate"
-          component={TextInput}
-          label="Fecha del servicio"
-          type="date"
-          className="w-full"
-        />
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <Field
+            name="serviceDate"
+            id="serviceDate"
+            component={TextInput}
+            label="Fecha del servicio"
+            type="date"
+            className="w-full"
+          />
+        </div>
+        <div>
+          <Field
+            name="endServiceDate"
+            id="endServiceDate"
+            component={TextInput}
+            label="Fecha fin del servicio"
+            type="date"
+            className="w-full"
+          />
+        </div>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Service Contact */}
+        <div>
+          <Field
+            name="serviceProviderName"
+            id="serviceProviderName"
+            component={TextInput}
+            label="Nombre del proveedor del servicio"
+            placeholder="Nombre del proveedor del servicio"
+            className="w-full"
+          />
+        </div>
+
+        {/* Información de Contacto del Proveedor */}
+        <div>
+          <Field
+            name="serviceContactInfo"
+            id="serviceContactInfo"
+            component={TextInput}
+            label="Información de contacto"
+            placeholder="Teléfono, correo, dirección"
+            className="w-full"
+          />
+        </div>
       </div>
 
       {/* Descripción */}

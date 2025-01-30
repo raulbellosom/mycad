@@ -4,6 +4,13 @@ export const ServicesFormSchema = Yup.object().shape({
   vehicleId: Yup.string().required('El vehículo es obligatorio'),
   reportType: Yup.string().required('El tipo de reporte es obligatorio'),
   serviceDate: Yup.date().required('La fecha del servicio es obligatoria'),
+  endServiceDate: Yup.date().nullable(),
+  serviceProviderName: Yup.string().required(
+    'El nombre del proveedor es obligatorio',
+  ),
+  serviceContactInfo: Yup.string().required(
+    'La información de contacto del proveedor del servicio es obligatoria',
+  ),
   description: Yup.string().required('La descripción es obligatoria'),
   totalCost: Yup.number()
     .required('El costo total es obligatorio')
