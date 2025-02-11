@@ -7,8 +7,11 @@ import CatalogProvider from './CatalogProvider';
 import RoleProvider from './RoleProvider';
 import PermissionProvider from './PermissionProvider';
 import ReportsProvider from './ReportsProvider';
-import { BreadcrumbProvider } from './BreadcrumbContext';
 import RepairReportsProvider from './RepairReportsProvider';
+import ClientsProvider from './ClientsProvider';
+import RentalProvider from './RentalProvider';
+
+import { BreadcrumbProvider } from './BreadcrumbContext';
 
 const SecurityProvider = ({ children }) => (
   <AuthProvider>
@@ -23,7 +26,11 @@ const DataProvider = ({ children }) => (
     <VehicleProvider>
       <CatalogProvider>
         <ReportsProvider>
-          <RepairReportsProvider>{children}</RepairReportsProvider>
+          <RepairReportsProvider>
+            <RentalProvider>
+              <ClientsProvider>{children}</ClientsProvider>
+            </RentalProvider>
+          </RepairReportsProvider>
         </ReportsProvider>
       </CatalogProvider>
     </VehicleProvider>

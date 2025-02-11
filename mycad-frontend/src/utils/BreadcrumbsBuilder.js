@@ -67,6 +67,10 @@ const BreadcrumbsBuilder = (path) => {
       href: '/reports/repairs/view',
     },
     {
+      label: 'Clientes',
+      href: '/clients',
+    },
+    {
       label: 'Catalogos',
       href: '/catalogs',
       icon: BiCategory,

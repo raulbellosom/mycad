@@ -66,4 +66,40 @@ export const PermissionsByGroup = {
     name: 'Dashboard',
     permissions: ['view_dashboard'],
   },
+  clients: {
+    name: 'Clientes',
+    permissions: [
+      'view_clients',
+      'create_clients',
+      'edit_clients',
+      'delete_clients',
+    ],
+  },
+  rentals: {
+    name: 'Rentas',
+    permissions: [
+      'view_rentals',
+      'create_rentals',
+      'edit_rentals',
+      'delete_rentals',
+    ],
+  },
+  serviceReports: {
+    name: 'Reportes de Servicios',
+    permissions: [
+      'view_services_reports',
+      'create_services_reports',
+      'edit_services_reports',
+      'delete_services_reports',
+    ],
+  },
+  repairReports: {
+    name: 'Reportes de Reparaciones',
+    permissions: [
+      'view_repairs_reports',
+      'create_repairs_reports',
+      'edit_repairs_reports',
+      'delete_repairs_reports',
+    ],
+  },
 };

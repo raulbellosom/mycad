@@ -15,6 +15,8 @@ import {
   FaUserCog,
   FaUserShield,
   FaToolbox,
+  FaAddressBook,
+  FaFileContract,
 } from 'react-icons/fa';
 import { useAuthContext } from '../../context/AuthContext';
 import AccountSidebar from './AccountSidebar';
@@ -31,6 +33,7 @@ import {
 } from 'react-icons/md';
 import useCheckPermissions from '../../hooks/useCheckPermissions';
 import { TbNotebook } from 'react-icons/tb';
+import { RiContractFill } from 'react-icons/ri';
 
 const themes = {
   light: {
@@ -290,6 +293,28 @@ const Sidebar = ({ children }) => {
                   )}
                 </SubMenu>
               )}
+              <SubMenu label="Rentas" icon={<RiContractFill size={23} />}>
+                <MenuItem
+                  icon={<FaFileContract size={23} />}
+                  active={isActivePath('/Rentas')}
+                  component={<Link to={'/Rentas'} />}
+                  onClick={() => {
+                    setToggled(false);
+                  }}
+                >
+                  Rentas
+                </MenuItem>
+                <MenuItem
+                  icon={<FaAddressBook size={23} />}
+                  active={isActivePath('/clients')}
+                  component={<Link to={'/clients'} />}
+                  onClick={() => {
+                    setToggled(false);
+                  }}
+                >
+                  Clientes
+                </MenuItem>
+              </SubMenu>
               <SubMenu label="Reportes" icon={<TbNotebook size={23} />}>
                 <MenuItem
                   icon={<MdMiscellaneousServices size={23} />}
