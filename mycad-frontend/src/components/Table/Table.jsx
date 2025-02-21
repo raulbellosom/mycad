@@ -6,7 +6,7 @@ const Table = ({ columns, children, sortBy, sortedBy, selectAll }) => {
   return (
     <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
-        <T hoverable>
+        <T striped hoverable>
           <T.Head className="text-nowrap">
             {columns?.map((col) => (
               <T.HeadCell

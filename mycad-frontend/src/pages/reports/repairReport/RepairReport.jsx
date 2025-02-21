@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { MdBuild } from 'react-icons/md'; // Cambié el ícono para diferenciarlo
 import { IoMdAdd } from 'react-icons/io';
 import { FaTrashAlt, FaEye, FaRegFile, FaPen, FaToolbox } from 'react-icons/fa';
 import TableHeader from '../../../components/Table/TableHeader';

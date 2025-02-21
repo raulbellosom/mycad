@@ -167,23 +167,50 @@ model ServicesFile{
 }
 
 model Rental {
-  id        String   @id @default(uuid())
-  vehicleId String
-  clientId  String
-  startDate DateTime
-  endDate   DateTime
-  dailyRate Float
-  totalCost Float
-  status    String
-  comments  String?
-  createdAt DateTime @default(now())
-  enabled   Boolean   @default(true)
-  updatedAt DateTime @updatedAt
-  client    Client   @relation(fields: [clientId], references: [id])
-  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  id                    String       @id @default(uuid())
+  vehicleId             String
+  clientId              String
+  startDate             DateTime     // Fecha y hora de inicio del alquiler
+  endDate               DateTime     // Fecha y hora estimada de finalización
+  pickupLocation        String?      // Ubicación de entrega del vehículo
+  dropoffLocation       String?      // Ubicación de devolución del vehículo
+  pickupDate            DateTime?    // Fecha y hora real de recogida
+  returnDate            DateTime?    // Fecha y hora real de devolución
+  dailyRate             Float        // Tarifa por día
+  deposit               Float?       // Depósito de garantía
+  totalCost             Float?       // Costo total calculado
+  paymentStatus         PaymentStatus @default(PENDING) // Estado del pago
+  initialMileage        Int?         // Kilometraje al inicio de la renta
+  finalMileage          Int?         // Kilometraje al finalizar la renta
+  fuelLevelStart        Float?       // Nivel de combustible al inicio (porcentaje o litros)
+  fuelLevelEnd          Float?       // Nivel de combustible al final
+  comments              String?
+  status                RentalStatus @default(PENDING) // Estado general del alquiler
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  enabled               Boolean      @default(true)
+
+  client                Client       @relation(fields: [clientId], references: [id])
+  vehicle               Vehicle      @relation(fields: [vehicleId], references: [id])
+  files                 RentalFile[] // Relación para almacenar archivos adjuntos
 
   @@index([clientId], map: "Rental_clientId_fkey")
   @@index([vehicleId], map: "Rental_vehicleId_fkey")
+}
+
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  PARTIAL
+  REFUNDED
+}
+
+enum RentalStatus {
+  PENDING    // Reserva realizada pero sin iniciar
+  ACTIVE     // Alquiler en curso
+  COMPLETED  // Alquiler finalizado
+  CANCELED   // Alquiler cancelado
 }
 
 model Client {
@@ -197,6 +224,21 @@ model Client {
   enabled     Boolean   @default(true)
   rentals     Rental[]
 }
+
+model RentalFile {
+  id          String   @id @default(uuid())
+  rentalId    String
+  url         String   // URL del archivo
+  type        String   // Tipo de archivo (pdf, doc, jpg, etc.)
+  metadata    Json?    // Información adicional en formato JSON, si es necesario
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rental      Rental   @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+
+  @@index([rentalId], map: "RentalFile_rentalId_fkey")
+}
+
 
 model File {
   id         String   @id @default(uuid())
