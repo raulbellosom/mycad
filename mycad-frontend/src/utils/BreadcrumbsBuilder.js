@@ -71,6 +71,22 @@ const BreadcrumbsBuilder = (path) => {
       href: '/clients',
     },
     {
+      label: 'Rentas',
+      href: '/rentals',
+    },
+    {
+      label: 'Crear Renta',
+      href: '/rentals/create',
+    },
+    {
+      label: 'Editar Renta',
+      href: '/rentals/edit',
+    },
+    {
+      label: 'Detalles de la Renta',
+      href: '/rentals/view',
+    },
+    {
       label: 'Catalogos',
       href: '/catalogs',
       icon: BiCategory,

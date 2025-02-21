@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import VehicleContext from './VehicleContext';
 import VehicleReducer from './VehicleReducer';
 import useVehicle from '../hooks/useVehicle';
@@ -18,6 +18,10 @@ const VehicleProvider = ({ children }) => {
     deleteVehicle,
     createMultipleVehicles,
   } = useVehicle(dispatch);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
 
   return (
     <VehicleContext.Provider

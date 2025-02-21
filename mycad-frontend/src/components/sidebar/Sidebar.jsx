@@ -296,8 +296,8 @@ const Sidebar = ({ children }) => {
               <SubMenu label="Rentas" icon={<RiContractFill size={23} />}>
                 <MenuItem
                   icon={<FaFileContract size={23} />}
-                  active={isActivePath('/Rentas')}
-                  component={<Link to={'/Rentas'} />}
+                  active={isActivePath('/rentals')}
+                  component={<Link to={'/rentals'} />}
                   onClick={() => {
                     setToggled(false);
                   }}

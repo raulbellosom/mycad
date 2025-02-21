@@ -184,8 +184,6 @@ model Rental {
   finalMileage          Int?         // Kilometraje al finalizar la renta
   fuelLevelStart        Float?       // Nivel de combustible al inicio (porcentaje o litros)
   fuelLevelEnd          Float?       // Nivel de combustible al final
-  vehicleConditionStart String?      // Observaciones del estado inicial del vehículo
-  vehicleConditionEnd   String?      // Observaciones del estado final del vehículo
   comments              String?
   status                RentalStatus @default(PENDING) // Estado general del alquiler
   createdAt             DateTime     @default(now())

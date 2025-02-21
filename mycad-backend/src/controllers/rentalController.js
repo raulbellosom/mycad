@@ -59,34 +59,36 @@ export const createRental = async (req, res) => {
       finalMileage,
       fuelLevelStart,
       fuelLevelEnd,
-      vehicleConditionStart,
-      vehicleConditionEnd,
       comments,
       status,
     } = req.body;
 
+    // Convertimos valores para evitar errores en Prisma
+    const rentalData = {
+      vehicleId,
+      clientId,
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null,
+      pickupLocation: pickupLocation || null,
+      dropoffLocation: dropoffLocation || null,
+      dailyRate: dailyRate ? parseFloat(dailyRate) : 0,
+      deposit: deposit ? parseFloat(deposit) : null,
+      totalCost: totalCost ? parseFloat(totalCost) : null,
+      paymentStatus,
+      initialMileage: initialMileage ? parseInt(initialMileage, 10) : null,
+      finalMileage: finalMileage ? parseInt(finalMileage, 10) : null,
+      fuelLevelStart: fuelLevelStart ? parseFloat(fuelLevelStart) : null,
+      fuelLevelEnd: fuelLevelEnd ? parseFloat(fuelLevelEnd) : null,
+      comments: comments || null,
+      status,
+    };
+
+    // Manejo de archivos si existen
     const files = req.files ? processUploadedFiles(req.files) : [];
 
     const newRental = await db.rental.create({
       data: {
-        vehicleId,
-        clientId,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        pickupLocation,
-        dropoffLocation,
-        dailyRate: parseFloat(dailyRate),
-        deposit: deposit ? parseFloat(deposit) : null,
-        totalCost: totalCost ? parseFloat(totalCost) : null,
-        paymentStatus,
-        initialMileage,
-        finalMileage,
-        fuelLevelStart,
-        fuelLevelEnd,
-        vehicleConditionStart,
-        vehicleConditionEnd,
-        comments,
-        status,
+        ...rentalData,
         files: {
           create: files,
         },
@@ -109,10 +111,75 @@ export const createRental = async (req, res) => {
 export const updateRental = async (req, res) => {
   try {
     const { id } = req.params;
+    const {
+      vehicleId,
+      clientId,
+      startDate,
+      endDate,
+      pickupLocation,
+      dropoffLocation,
+      dailyRate,
+      deposit,
+      totalCost,
+      paymentStatus,
+      initialMileage,
+      finalMileage,
+      fuelLevelStart,
+      fuelLevelEnd,
+      comments,
+      status,
+      existingFiles, // IDs de archivos que deben mantenerse
+    } = req.body;
+
+    // Convertimos valores para evitar errores en Prisma
+    const rentalData = {
+      vehicleId,
+      clientId,
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null,
+      pickupLocation: pickupLocation || null,
+      dropoffLocation: dropoffLocation || null,
+      dailyRate: dailyRate ? parseFloat(dailyRate) : 0,
+      deposit: deposit ? parseFloat(deposit) : null,
+      totalCost: totalCost ? parseFloat(totalCost) : null,
+      paymentStatus,
+      initialMileage: initialMileage ? parseInt(initialMileage, 10) : null,
+      finalMileage: finalMileage ? parseInt(finalMileage, 10) : null,
+      fuelLevelStart: fuelLevelStart ? parseFloat(fuelLevelStart) : null,
+      fuelLevelEnd: fuelLevelEnd ? parseFloat(fuelLevelEnd) : null,
+      comments: comments || null,
+      status,
+    };
+
+    // 🟢 PROCESAR ARCHIVOS ADJUNTOS
+    const newFiles = req.files ? processUploadedFiles(req.files) : [];
+
+    // 🔴 Eliminamos archivos si no están en `existingFiles`
+    if (existingFiles) {
+      await db.rentalFile.deleteMany({
+        where: {
+          rentalId: id,
+          id: { notIn: existingFiles }, // Eliminamos archivos que no están en la lista de archivos existentes
+        },
+      });
+    }
+
+    // 🟢 ACTUALIZAMOS LA RENTA
     const updatedRental = await db.rental.update({
       where: { id },
-      data: req.body,
+      data: {
+        ...rentalData,
+        files: {
+          create: newFiles, // Agregamos los nuevos archivos
+        },
+      },
+      include: {
+        client: true,
+        vehicle: true,
+        files: true,
+      },
     });
+
     res.status(200).json(updatedRental);
   } catch (error) {
     console.error("Error al actualizar la renta:", error);
@@ -138,27 +205,85 @@ export const deleteRental = async (req, res) => {
 // Buscar rentas con filtros y paginación
 export const searchRentals = async (req, res) => {
   try {
-    const { search = "", page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
+    const {
+      search = "",
+      status,
+      paymentStatus,
+      clientId,
+      vehicleId,
+      page = 1,
+      limit = 10,
+    } = req.query;
 
+    const offset = (page - 1) * limit;
     const filters = { enabled: true };
+
+    // Búsqueda general (por nombre del cliente, placas del vehículo o comentarios)
     if (search.trim()) {
       filters.OR = [
-        { comments: { contains: search } },
-        { client: { name: { contains: search } } },
-        { vehicle: { plateNumber: { contains: search } } },
+        { comments: { contains: search, mode: "insensitive" } },
+        // buscar por nombre del cliente y empresa donde trabaja
+        {
+          client: {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { company: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        },
+        // buscar por placas del vehículo
+        { vehicle: { plateNumber: { contains: search, mode: "insensitive" } } },
       ];
     }
 
+    // Filtrar por estado de la renta (PENDING, ACTIVE, COMPLETED, CANCELED)
+    if (status && status !== "ALL") {
+      filters.status = status;
+    }
+
+    // Filtrar por estado del pago (PENDING, COMPLETED, PARTIAL, REFUNDED)
+    if (paymentStatus && paymentStatus !== "ALL") {
+      filters.paymentStatus = paymentStatus;
+    }
+
+    // Filtrar por cliente específico
+    if (clientId) {
+      filters.clientId = clientId;
+    }
+
+    // Filtrar por vehículo específico
+    if (vehicleId) {
+      filters.vehicleId = vehicleId;
+    }
+
+    // Obtener rentas con filtros aplicados incluyendo el modelo, marca, tipo y una imagen del vehículo
     const rentals = await db.rental.findMany({
       where: filters,
       skip: parseInt(offset),
       take: parseInt(limit),
-      include: { client: true, vehicle: true, files: true },
+      include: {
+        client: true,
+        vehicle: {
+          include: {
+            model: {
+              include: {
+                brand: true,
+                type: true,
+              },
+            },
+            images: {
+              take: 1, // Obtener solo una imagen si existe
+            },
+          },
+        },
+        files: true,
+      },
       orderBy: { createdAt: "desc" },
     });
 
+    // Contar el total de rentas con los filtros aplicados
     const totalRentals = await db.rental.count({ where: filters });
+
     res.status(200).json({
       total: totalRentals,
       page: parseInt(page),

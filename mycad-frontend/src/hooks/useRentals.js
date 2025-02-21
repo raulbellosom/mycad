@@ -39,7 +39,7 @@ export const useRentals = () => {
   };
 
   // Crear una nueva renta
-  const createNewRental = useMutation({
+  const { mutate: createNewRental } = useMutation({
     mutationFn: createRental,
     onSuccess: (newRental) => {
       dispatch({ type: 'ADD_RENTAL', payload: newRental });
@@ -52,7 +52,7 @@ export const useRentals = () => {
   });
 
   // Actualizar una renta
-  const modifyRental = useMutation({
+  const { mutate: modifyRental } = useMutation({
     mutationFn: updateRental,
     onSuccess: (updatedRental) => {
       dispatch({ type: 'UPDATE_RENTAL', payload: updatedRental });
@@ -64,8 +64,8 @@ export const useRentals = () => {
     },
   });
 
-  // Eliminar una renta (eliminación lógica)
-  const removeRental = useMutation({
+  // Eliminar una renta
+  const { mutate: removeRental } = useMutation({
     mutationFn: deleteRental,
     onSuccess: (data) => {
       dispatch({ type: 'DELETE_RENTAL', payload: data.data });
