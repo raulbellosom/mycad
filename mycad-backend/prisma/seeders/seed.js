@@ -216,7 +216,6 @@ async function createRootUser(roles) {
         id: uuidv4(),
         firstName: "Mycad",
         lastName: "Root",
-        userName: "root",
         email: "root@mycad.mx",
         password: hashedPassword,
         roleId: rootRole.id,
