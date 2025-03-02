@@ -19,10 +19,11 @@ export const rentalsInitialState = {
     status: 'ALL',
   },
   pagination: {
-    page: 1,
-    limit: 10,
+    totalRecords: 0,
+    currentPage: 1,
+    pageSize: 10,
+    totalRentals: 0,
   },
-  totalRentals: 0,
 };
 
 const rentalReducer = (state, action) => {
@@ -53,6 +54,7 @@ const rentalReducer = (state, action) => {
         rentals: state.rentals.map((rental) =>
           rental.id === action.payload.id ? action.payload : rental,
         ),
+        rental: action.payload,
       };
     case RENTAL_ACTIONS.DELETE_RENTAL:
       return {

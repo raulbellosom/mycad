@@ -19,7 +19,6 @@ const RentalForm = forwardRef(
         formik.submitForm();
       },
     }));
-    console.log(vehicles);
     return (
       <FormikProvider value={formik}>
         <Form ref={ref} className="space-y-4" onSubmit={formik.handleSubmit}>

@@ -306,7 +306,6 @@ const Vehicles = () => {
           headers={columns}
           deepSearch={searchFilters?.deepSearch}
           setDeepSearch={handleDeepSearch}
-          vehicleConditions={vehicleConditions}
           onRefreshData={handleGetChanges}
         />
         {vehicles && !isPending ? (

@@ -26,6 +26,51 @@ export const createRental = async (data) => {
   }
 };
 
+// Actualizar una renta
+export const updateRental = async (rental) => {
+  const { id, values: data } = rental;
+
+  // Verificar si `data` es undefined o null
+  if (!data) {
+    throw new Error("El objeto 'data' no está definido o es nulo.");
+  }
+
+  try {
+    const formData = new FormData();
+
+    // Agregar propiedades de `data` al FormData
+    Object.keys(data).forEach((key) => {
+      if (Array.isArray(data[key])) {
+        // Si es un array, convertirlo a JSON
+        formData.append(key, JSON.stringify(data[key]));
+      } else if (key !== 'files') {
+        // Si no es un array y no es 'files', agregarlo directamente
+        formData.append(key, data[key]);
+      }
+    });
+
+    // Manejar archivos
+    if (data.files) {
+      data.files.forEach((file) => {
+        if (file instanceof File) {
+          // Si es un archivo nuevo (instancia de File), agregarlo al FormData
+          formData.append('files', file);
+        } else if (file.id) {
+          // Si es un archivo existente, agregar solo el ID
+          formData.append('fileIds', file.id);
+        }
+      });
+    }
+
+    // Enviar la solicitud
+    const response = await api.put(`/rentals/${id}`, formData, headerFormData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar la renta:', error);
+    throw error;
+  }
+};
+
 // Obtener todas las rentas
 export const getRentals = async () => {
   try {
@@ -38,37 +83,12 @@ export const getRentals = async () => {
 };
 
 // Obtener una renta por ID
-export const getRentalById = async (id) => {
+export const getRentalById = async ({ id, signal }) => {
   try {
-    const response = await api.get(`/rentals/${id}`);
+    const response = await api.get(`/rentals/${id}`, { signal });
     return response.data;
   } catch (error) {
     console.error('Error al obtener la renta:', error);
-    throw error;
-  }
-};
-
-// Actualizar una renta
-export const updateRental = async (id, data) => {
-  try {
-    const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      if (Array.isArray(data[key])) {
-        formData.append(key, JSON.stringify(data[key]));
-      } else {
-        formData.append(key, data[key]);
-      }
-    });
-    if (data.files) {
-      data.files.forEach((file) => {
-        formData.append('files', file);
-      });
-    }
-
-    const response = await api.put(`/rentals/${id}`, formData, headerFormData);
-    return response.data;
-  } catch (error) {
-    console.error('Error al actualizar la renta:', error);
     throw error;
   }
 };
@@ -85,10 +105,26 @@ export const deleteRental = async (id) => {
 };
 
 // Buscar rentas con filtros y paginación
-export const searchRentals = async ({ search = '', page = 1, limit = 10 }) => {
+export const searchRentals = async ({
+  searchTerm = '',
+  sortBy,
+  order,
+  page,
+  pageSize,
+  signal,
+  status,
+}) => {
   try {
     const response = await api.get('/rentals/search', {
-      params: { search, page, limit },
+      params: {
+        search: searchTerm,
+        sortBy,
+        order,
+        page,
+        pageSize,
+        status,
+      },
+      signal,
     });
     return response.data;
   } catch (error) {

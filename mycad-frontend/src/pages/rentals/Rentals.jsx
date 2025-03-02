@@ -52,7 +52,16 @@ const Rentals = () => {
     page: currentPageNumber,
     sortBy: 'createdAt',
     order: 'asc',
+    status: [],
+    paymentStatus: [],
   });
+
+  const rentalStatus = [
+    { id: 1, name: 'Pendiente' },
+    { id: 2, name: 'Activa' },
+    { id: 3, name: 'Completada' },
+    { id: 4, name: 'Cancelada' },
+  ];
 
   const {
     data: rentals,
@@ -69,33 +78,111 @@ const Rentals = () => {
     refetch();
   }, [searchFilters]);
 
-  const goOnPrevPage = useCallback(() => {
+  const goOnPrevPage = () => {
     setSearchFilters((prevState) => ({
       ...prevState,
-      page: prevState?.page - 1,
+      page: prevState.page - 1,
     }));
-  }, []);
+  };
 
-  const goOnNextPage = useCallback(() => {
+  const goOnNextPage = () => {
     setSearchFilters((prevState) => ({
       ...prevState,
-      page: prevState?.page + 1,
+      page: prevState.page + 1,
     }));
-  }, []);
+  };
 
-  const handleSearch = useCallback((e) => {
-    e.preventDefault();
-    if (lastChange.current) {
-      clearTimeout(lastChange.current);
-    }
-    lastChange.current = setTimeout(() => {
-      lastChange.current = null;
-      setSearchFilters((prevState) => ({
+  const handleSelectChange = useCallback((page) => {
+    setSearchFilters((prevState) => {
+      return {
         ...prevState,
-        searchTerm: e.target.value,
-      }));
-    }, 600);
+        page,
+      };
+    });
   }, []);
+
+  const handleSearch = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (lastChange.current) {
+        clearTimeout(lastChange.current);
+      }
+      lastChange.current = setTimeout(() => {
+        setSearchFilters((prevState) => ({
+          ...prevState,
+          searchTerm: e.target.value,
+          page: 1,
+        }));
+      }, 500);
+    },
+    [searchFilters.searchTerm],
+  );
+
+  const sortBy = (column) => {
+    const selectedHeaderIndex = columns?.findIndex((col) => col.id === column);
+    let updatedHeaders = [];
+    if (selectedHeaderIndex !== -1) {
+      const selectedHeader = columns[selectedHeaderIndex];
+      selectedHeader;
+      const updatedHeader = {
+        ...selectedHeader,
+        order: selectedHeader?.order === 'asc' ? 'desc' : 'asc',
+      };
+      updatedHeaders = [...columns];
+      updatedHeaders[selectedHeaderIndex] = updatedHeader;
+      setSearchFilters((prevState) => {
+        return {
+          ...prevState,
+          sortBy: column,
+          order: updatedHeader?.order,
+        };
+      });
+    }
+    setColumns(updatedHeaders);
+  };
+
+  const onCheckFilter = (value) => {
+    if (value !== '') {
+      if (value === 'Seleccionar todos') {
+        setSearchFilters((prevState) => {
+          return {
+            ...prevState,
+            status: rentalStatus.map((condition) => condition.name),
+          };
+        });
+      } else if (value === 'Quitar todos') {
+        setSearchFilters((prevState) => {
+          return {
+            ...prevState,
+            status: [],
+          };
+        });
+      } else {
+        let currentValues = [...searchFilters?.status];
+        if (currentValues?.includes(value)) {
+          currentValues = currentValues.filter(
+            (condition) => condition !== value,
+          );
+        } else {
+          currentValues.push(value);
+        }
+        setSearchFilters((prevState) => {
+          return {
+            ...prevState,
+            status: currentValues,
+          };
+        });
+      }
+    }
+  };
+
+  const handleChangePageSize = (e) => {
+    setSearchFilters((prevState) => ({
+      ...prevState,
+      pageSize: e.target.value,
+      page: 1,
+    }));
+  };
 
   const handleDeleteRental = () => {
     if (rentalId) {
@@ -130,15 +217,22 @@ const Rentals = () => {
         />
         <TableActions
           handleSearchTerm={handleSearch}
+          onCheckFilter={onCheckFilter}
           onRefreshData={handleGetChanges}
+          headers={columns}
+          selectedFilters={searchFilters.status}
+          filters={rentalStatus}
         />
         {rentals && !isPending ? (
           rentals?.data?.length > 0 ? (
             <>
-              <div className="hidden md:block">
-                <Table columns={columns} sortedBy={searchFilters.sortBy}>
+              <div>
+                <Table
+                  columns={columns}
+                  sortBy={sortBy}
+                  sortedBy={searchFilters.sortBy}
+                >
                   {rentals?.data?.map((rental) => (
-                    // append action value to rental object
                     <T.Row
                       key={rental.id}
                       onDoubleClick={() =>
@@ -242,68 +336,6 @@ const Rentals = () => {
                   ))}
                 </Table>
               </div>
-              <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 md:hidden">
-                {rentals?.data?.map((rental) => (
-                  <Card
-                    key={rental.id}
-                    data={{
-                      title: { key: 'Cliente', value: rental.client?.name },
-                      subtitle: {
-                        key: 'Vehículo',
-                        value: rental.vehicle?.plateNumber,
-                      },
-                      cost: {
-                        key: 'Costo Total',
-                        value: rental?.totalCost
-                          ? parseToCurrency(rental.totalCost)
-                          : '',
-                      },
-                      status: { key: 'Estatus', value: rental.status },
-                      paymentStatus: {
-                        key: 'Estado de Pago',
-                        value: rental.paymentStatus,
-                      },
-                      files: { key: 'Archivos', value: rental.files?.length },
-                      startDate: {
-                        key: 'Fecha Inicial',
-                        value: parseToLocalDate(rental.startDate),
-                      },
-                      endDate: {
-                        key: 'Fecha Final',
-                        value: parseToLocalDate(rental.endDate),
-                      },
-                      actions: {
-                        key: 'Acciones',
-                        value: (
-                          <ActionButtons
-                            extraActions={[
-                              {
-                                label: 'Ver',
-                                icon: FaEye,
-                                color: 'cyan',
-                                action: () =>
-                                  navigate(`/rentals/view/${rental.id}`),
-                              },
-                              {
-                                label: 'Editar',
-                                icon: FaEdit,
-                                color: 'yellow',
-                                action: () =>
-                                  navigate(`/rentals/edit/${rental.id}`),
-                              },
-                            ]}
-                            onRemove={() => {
-                              setIsOpenModal(true);
-                              setRentalId(rental.id);
-                            }}
-                          />
-                        ),
-                      },
-                    }}
-                    showImage
-                  />
-                ))}
-              </div>
             </>
           ) : (
             <TableResultsNotFound />
@@ -311,7 +343,23 @@ const Rentals = () => {
         ) : (
           <Skeleton className="w-full h-10" count={10} />
         )}
+        {rentals?.pagination && (
+          <TableFooter
+            pagination={rentals?.pagination}
+            goOnNextPage={goOnNextPage}
+            goOnPrevPage={goOnPrevPage}
+            handleSelectChange={handleSelectChange}
+            changePageSize={handleChangePageSize}
+          />
+        )}
       </section>
+      {isOpenModal && (
+        <ModalRemove
+          isOpenModal={isOpenModal}
+          onCloseModal={() => setIsOpenModal(false)}
+          removeFunction={handleDeleteRental}
+        />
+      )}
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { db } from "../lib/db.js";
+import { RentalStatus } from "@prisma/client";
 import { processUploadedFiles } from "../middleware/fileUploadRentalMiddleware.js";
 
 // Obtener todas las rentas
@@ -128,10 +129,9 @@ export const updateRental = async (req, res) => {
       fuelLevelEnd,
       comments,
       status,
-      existingFiles, // IDs de archivos que deben mantenerse
+      existingFiles,
     } = req.body;
 
-    // Convertimos valores para evitar errores en Prisma
     const rentalData = {
       vehicleId,
       clientId,
@@ -151,26 +151,32 @@ export const updateRental = async (req, res) => {
       status,
     };
 
-    // 🟢 PROCESAR ARCHIVOS ADJUNTOS
     const newFiles = req.files ? processUploadedFiles(req.files) : [];
 
-    // 🔴 Eliminamos archivos si no están en `existingFiles`
-    if (existingFiles) {
+    const parsedExistingFiles = existingFiles ? JSON.parse(existingFiles) : [];
+    const validFileIds = parsedExistingFiles
+      .filter((id) => id !== null && id !== undefined && id !== "")
+      .map((id) => id);
+
+    if (validFileIds.length > 0) {
       await db.rentalFile.deleteMany({
         where: {
           rentalId: id,
-          id: { notIn: existingFiles }, // Eliminamos archivos que no están en la lista de archivos existentes
+          id: { notIn: validFileIds },
         },
+      });
+    } else {
+      await db.rentalFile.deleteMany({
+        where: { rentalId: id },
       });
     }
 
-    // 🟢 ACTUALIZAMOS LA RENTA
     const updatedRental = await db.rental.update({
       where: { id },
       data: {
         ...rentalData,
         files: {
-          create: newFiles, // Agregamos los nuevos archivos
+          create: newFiles,
         },
       },
       include: {
@@ -207,60 +213,106 @@ export const searchRentals = async (req, res) => {
   try {
     const {
       search = "",
+      pageSize = 10,
+      sortBy = "createdAt",
+      order = "desc",
       status,
-      paymentStatus,
-      clientId,
-      vehicleId,
       page = 1,
-      limit = 10,
     } = req.query;
 
-    const offset = (page - 1) * limit;
+    const offset = (page - 1) * pageSize;
     const filters = { enabled: true };
 
-    // Búsqueda general (por nombre del cliente, placas del vehículo o comentarios)
+    const validSortFields = [
+      "vehicle.model.name",
+      "client.name",
+      "totalCost",
+      "status",
+      "paymentStatus",
+      "startDate",
+      "endDate",
+      "createdAt",
+      "updatedAt",
+    ];
+
+    const searchNumber = !isNaN(search) ? parseFloat(search) : null;
+
     if (search.trim()) {
       filters.OR = [
-        { comments: { contains: search, mode: "insensitive" } },
-        // buscar por nombre del cliente y empresa donde trabaja
+        { comments: { contains: search } },
+        { pickupLocation: { contains: search } },
+        { dropoffLocation: { contains: search } },
         {
           client: {
             OR: [
-              { name: { contains: search, mode: "insensitive" } },
-              { company: { contains: search, mode: "insensitive" } },
+              { name: { contains: search } },
+              { company: { contains: search } },
             ],
           },
         },
-        // buscar por placas del vehículo
-        { vehicle: { plateNumber: { contains: search, mode: "insensitive" } } },
+        { vehicle: { plateNumber: { contains: search } } },
+        { vehicle: { model: { name: { contains: search } } } },
+        { vehicle: { model: { brand: { name: { contains: search } } } } },
+        { vehicle: { model: { type: { name: { contains: search } } } } },
       ];
+      if (searchNumber !== null) {
+        filters.OR.push(
+          { totalCost: { gte: searchNumber * 0.9, lte: searchNumber * 1.1 } },
+          { deposit: { gte: searchNumber * 0.9, lte: searchNumber * 1.1 } },
+          { dailyRate: { gte: searchNumber * 0.9, lte: searchNumber * 1.1 } }
+        );
+      }
     }
 
-    // Filtrar por estado de la renta (PENDING, ACTIVE, COMPLETED, CANCELED)
+    const orderField = validSortFields.includes(sortBy) ? sortBy : "createdAt";
+    const orderDirection = order === "desc" ? "desc" : "asc";
+
+    const formSortBy = (value, order) => {
+      let arr = value.split(".");
+      let obj = {};
+      if (arr.length === 3) {
+        obj = {
+          [arr[0]]: {
+            [arr[1]]: {
+              [arr[2]]: order,
+            },
+          },
+        };
+      } else if (arr.length === 2) {
+        obj = {
+          [arr[0]]: {
+            [arr[1]]: order,
+          },
+        };
+      } else {
+        obj = {
+          [arr[0]]: order,
+        };
+      }
+      return obj;
+    };
+
+    const statusMapping = {
+      Pendiente: RentalStatus.PENDING,
+      Activa: RentalStatus.ACTIVE,
+      Completada: RentalStatus.COMPLETED,
+      Cancelada: RentalStatus.CANCELED,
+    };
+
     if (status && status !== "ALL") {
-      filters.status = status;
+      const validStatuses = Array.isArray(status)
+        ? status.map((s) => statusMapping[s.trim()]).filter(Boolean)
+        : statusMapping[status.trim()]
+        ? [statusMapping[status.trim()]]
+        : [];
+
+      if (validStatuses.length > 0) {
+        filters.status = { in: validStatuses };
+      }
     }
 
-    // Filtrar por estado del pago (PENDING, COMPLETED, PARTIAL, REFUNDED)
-    if (paymentStatus && paymentStatus !== "ALL") {
-      filters.paymentStatus = paymentStatus;
-    }
-
-    // Filtrar por cliente específico
-    if (clientId) {
-      filters.clientId = clientId;
-    }
-
-    // Filtrar por vehículo específico
-    if (vehicleId) {
-      filters.vehicleId = vehicleId;
-    }
-
-    // Obtener rentas con filtros aplicados incluyendo el modelo, marca, tipo y una imagen del vehículo
     const rentals = await db.rental.findMany({
       where: filters,
-      skip: parseInt(offset),
-      take: parseInt(limit),
       include: {
         client: true,
         vehicle: {
@@ -272,22 +324,27 @@ export const searchRentals = async (req, res) => {
               },
             },
             images: {
-              take: 1, // Obtener solo una imagen si existe
+              take: 1,
             },
           },
         },
         files: true,
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: formSortBy(orderField, orderDirection),
+      take: parseInt(pageSize),
+      skip: parseInt(offset),
     });
 
-    // Contar el total de rentas con los filtros aplicados
     const totalRentals = await db.rental.count({ where: filters });
+    const totalPages = Math.ceil(totalRentals / pageSize);
 
     res.status(200).json({
-      total: totalRentals,
-      page: parseInt(page),
-      limit: parseInt(limit),
+      pagination: {
+        totalRecords: totalRentals,
+        totalPages: totalPages,
+        currentPage: parseInt(page),
+        pageSize: parseInt(pageSize),
+      },
       data: rentals,
     });
   } catch (error) {
