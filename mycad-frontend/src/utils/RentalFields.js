@@ -1,16 +1,9 @@
 export const rentalColumns = [
   {
     id: 'vehicle.images',
-    value: 'Imagen',
-    classes: 'max-w-12 max-h-12 w-auto h-auto',
+    value: '',
+    classes: 'max-w-12 max-h-12 min-w-12 min-h-12',
     type: 'image',
-  },
-  {
-    id: 'clientInfo',
-    value: 'Cliente',
-    classes: 'w-auto',
-    order: 'asc',
-    type: 'custom',
   },
   {
     id: 'vehicleInfo',
@@ -19,6 +12,14 @@ export const rentalColumns = [
     order: 'asc',
     type: 'custom',
   },
+  {
+    id: 'clientInfo',
+    value: 'Cliente',
+    classes: 'w-auto',
+    order: 'asc',
+    type: 'custom',
+  },
+
   {
     id: 'totalCost',
     value: 'Costo Total',

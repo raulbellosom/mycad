@@ -19,21 +19,23 @@ const TableFooter = ({
     'flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white';
   const disablePagClass =
     'pointer-events-none opacity-60 flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white';
-  for (let i = 1; i <= totalPages; i++) {
-    const pagC = (
+
+  const startPage = Math.max(1, currentPage - 2);
+  const endPage = Math.min(totalPages, startPage + 4);
+
+  for (let i = startPage; i <= endPage; i++) {
+    paginationNumber.push(
       <li key={i} onClick={() => handleSelectChange(i)}>
-        {
-          <a
-            href="#"
-            className={classNames(i == currentPage ? activePagClass : pagClass)}
-          >
-            {i}
-          </a>
-        }{' '}
-      </li>
+        <a
+          href="#"
+          className={classNames(i === currentPage ? activePagClass : pagClass)}
+        >
+          {i}
+        </a>
+      </li>,
     );
-    paginationNumber.push(pagC);
   }
+
   return (
     <nav
       className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
@@ -70,7 +72,7 @@ const TableFooter = ({
             onChange={changePageSize}
             disabled={totalRecords === 0}
           >
-            {[5, 10, 20, 30, 50, 100].map((item) => (
+            {[3, 5, 10, 15, 20, 30, 50, 100].map((item) => (
               <option disabled={totalRecords < item} key={item} value={item}>
                 {item}
               </option>
