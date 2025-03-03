@@ -1,6 +1,26 @@
 import { db } from "../lib/db.js";
 import { RentalStatus } from "@prisma/client";
 import { processUploadedFiles } from "../middleware/fileUploadRentalMiddleware.js";
+import crypto from "crypto";
+
+const generateUniqueFolio = async () => {
+  const year = new Date().getFullYear();
+  let uniqueFolio;
+
+  while (true) {
+    const randomCode = crypto.randomBytes(3).toString("hex").toUpperCase(); // Genera un código aleatorio de 3 bytes (6 caracteres)
+    uniqueFolio = `RNT-${year}-${randomCode}`;
+
+    // Verifica si ya existe en la base de datos
+    const existingRental = await db.rental.findUnique({
+      where: { folio: uniqueFolio },
+    });
+
+    if (!existingRental) break; // Si no existe, salimos del loop
+  }
+
+  return uniqueFolio;
+};
 
 // Obtener todas las rentas
 export const getAllRentals = async (req, res) => {
@@ -64,10 +84,13 @@ export const createRental = async (req, res) => {
       status,
     } = req.body;
 
+    const folio = await generateUniqueFolio();
+
     // Convertimos valores para evitar errores en Prisma
     const rentalData = {
       vehicleId,
       clientId,
+      folio,
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
       pickupLocation: pickupLocation || null,
