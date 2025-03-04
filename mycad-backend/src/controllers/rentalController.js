@@ -28,7 +28,19 @@ export const getAllRentals = async (req, res) => {
     const rentals = await db.rental.findMany({
       include: {
         client: true,
-        vehicle: true,
+        vehicle: {
+          include: {
+            model: {
+              include: {
+                brand: true,
+                type: true,
+              },
+            },
+            images: {
+              take: 1,
+            },
+          },
+        },
         files: true,
       },
     });
@@ -49,7 +61,19 @@ export const getRentalById = async (req, res) => {
       where: { id },
       include: {
         client: true,
-        vehicle: true,
+        vehicle: {
+          include: {
+            model: {
+              include: {
+                brand: true,
+                type: true,
+              },
+            },
+            images: {
+              take: 1,
+            },
+          },
+        },
         files: true,
       },
     });
@@ -119,7 +143,19 @@ export const createRental = async (req, res) => {
       },
       include: {
         client: true,
-        vehicle: true,
+        vehicle: {
+          include: {
+            model: {
+              include: {
+                brand: true,
+                type: true,
+              },
+            },
+            images: {
+              take: 1,
+            },
+          },
+        },
         files: true,
       },
     });
@@ -204,7 +240,19 @@ export const updateRental = async (req, res) => {
       },
       include: {
         client: true,
-        vehicle: true,
+        vehicle: {
+          include: {
+            model: {
+              include: {
+                brand: true,
+                type: true,
+              },
+            },
+            images: {
+              take: 1,
+            },
+          },
+        },
         files: true,
       },
     });
