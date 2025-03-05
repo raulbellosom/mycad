@@ -33,6 +33,7 @@ import Clients from '../pages/clients/Clients';
 import Rentals from '../pages/rentals/Rentals';
 import CreateRental from '../pages/rentals/CreateRental';
 import UpdateRental from '../pages/rentals/UpdateRental';
+import ViewRental from '../pages/rentals/ViewRental';
 
 const AppRouter = () => {
   const { user } = useContext(AuthContext);
@@ -104,6 +105,7 @@ const AuthorizedRoute = ({ user }) => {
                   <Route path="/rentals" element={<Rentals />} />
                   <Route path="/rentals/create" element={<CreateRental />} />
                   <Route path="/rentals/edit/:id" element={<UpdateRental />} />
+                  <Route path="/rentals/view/:id" element={<ViewRental />} />
                   <Route path="/roles" element={<Roles />} />
                   <Route
                     path="/login"

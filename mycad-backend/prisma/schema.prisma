@@ -168,6 +168,7 @@ model ServicesFile{
 
 model Rental {
   id                    String       @id @default(uuid())
+  folio                 String       @unique
   vehicleId             String
   clientId              String
   startDate             DateTime     // Fecha y hora de inicio del alquiler
