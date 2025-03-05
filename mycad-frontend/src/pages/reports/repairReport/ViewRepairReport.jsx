@@ -21,6 +21,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { FaCalendarXmark } from 'react-icons/fa6';
+import withPermission from '../../../utils/withPermissions';
 
 const ViewRepairReport = () => {
   const { id } = useParams();
@@ -328,4 +329,9 @@ const ViewRepairReport = () => {
   );
 };
 
-export default ViewRepairReport;
+const ProtectedRepairReportView = withPermission(
+  ViewRepairReport,
+  'view_repairs_reports',
+);
+
+export default ProtectedRepairReportView;

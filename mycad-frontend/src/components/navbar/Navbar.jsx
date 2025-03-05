@@ -13,7 +13,6 @@ const Navbar = ({
   broken,
   user,
 }) => {
-  console.log(user);
   const { firstName, lastName, role, photo } = user;
   const name = `${firstName} ${lastName}`;
   const userRole = role?.name;

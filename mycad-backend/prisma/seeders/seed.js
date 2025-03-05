@@ -27,7 +27,7 @@ async function createConditions() {
 }
 
 async function createRoles() {
-  const rolesToCreate = ["Root", "Admin", "User", "Guest"];
+  const rolesToCreate = ["Root", "Administrador", "User", "Guest"];
   const createdRoles = {};
 
   for (const roleName of rolesToCreate) {

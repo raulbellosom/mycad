@@ -19,6 +19,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { BiSolidCarGarage, BiSolidContact } from 'react-icons/bi';
+import withPermission from '../../../utils/withPermissions';
 
 const ViewServicesReport = () => {
   const { id } = useParams();
@@ -298,4 +299,9 @@ const ViewServicesReport = () => {
   );
 };
 
-export default ViewServicesReport;
+const ProtectedViewServiceReportView = withPermission(
+  ViewServicesReport,
+  'view_services_reports',
+);
+
+export default ProtectedViewServiceReportView;

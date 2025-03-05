@@ -7,6 +7,7 @@ import ActionButtons from '../../../components/ActionButtons/ActionButtons';
 import { FaEye, FaSave } from 'react-icons/fa';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { useNavigate, useParams } from 'react-router-dom';
+import withPermission from '../../../utils/withPermissions';
 
 const UpdateServicesReport = () => {
   const navigate = useNavigate();
@@ -140,4 +141,9 @@ const UpdateServicesReport = () => {
   );
 };
 
-export default UpdateServicesReport;
+const ProtectedUpdateServiceReportView = withPermission(
+  UpdateServicesReport,
+  'edit_services_reports',
+);
+
+export default ProtectedUpdateServiceReportView;

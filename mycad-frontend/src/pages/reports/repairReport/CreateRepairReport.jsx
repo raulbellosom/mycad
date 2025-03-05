@@ -7,6 +7,7 @@ import ActionButtons from '../../../components/ActionButtons/ActionButtons';
 import { FaSave, FaToolbox } from 'react-icons/fa';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
+import withPermission from '../../../utils/withPermissions';
 
 const CreateRepairReport = () => {
   const navigate = useNavigate();
@@ -102,4 +103,9 @@ const CreateRepairReport = () => {
   );
 };
 
-export default CreateRepairReport;
+const ProtectedCreateRepairReportView = withPermission(
+  CreateRepairReport,
+  'create_repairs_reports',
+);
+
+export default ProtectedCreateRepairReportView;

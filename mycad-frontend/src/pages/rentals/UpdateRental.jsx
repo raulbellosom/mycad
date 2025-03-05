@@ -11,6 +11,7 @@ import { MdArrowBack } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import { getRentalById } from '../../services/rentals.api';
 import ModalRemove from '../../components/Modals/ModalRemove';
+import useCheckPermissions from '../../hooks/useCheckPermissions';
 
 const UpdateRental = () => {
   const formRef = useRef(null);
@@ -143,6 +144,9 @@ const UpdateRental = () => {
     navigate('/rentals');
   };
 
+  const isUpdateRentalPermission = useCheckPermissions('edit_rentals');
+  const isViewRentalPermission = useCheckPermissions('view_rental');
+
   return (
     <>
       <div className="h-full bg-white p-4 rounded-md">
@@ -156,7 +160,9 @@ const UpdateRental = () => {
               extraActions={[
                 {
                   label: 'Volver',
-                  action: onCancel,
+                  action: isViewRentalPermission.hasPermission
+                    ? onCancel
+                    : navigate('/vehicles'),
                   color: 'red',
                   icon: MdArrowBack,
                 },
@@ -168,7 +174,9 @@ const UpdateRental = () => {
                 },
                 {
                   label: 'Actualizar',
-                  action: handleSubmitRef,
+                  action: isUpdateRentalPermission.hasPermission
+                    ? handleSubmitRef
+                    : null,
                   icon: FaSave,
                   color: 'green',
                 },
@@ -202,6 +210,6 @@ const UpdateRental = () => {
   );
 };
 
-const ProtectedUpdateRental = withPermission(UpdateRental, 'create_rentals');
+const ProtectedUpdateRental = withPermission(UpdateRental, 'edit_rentals');
 
 export default ProtectedUpdateRental;
