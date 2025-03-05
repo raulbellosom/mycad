@@ -12,6 +12,7 @@ import { PiCarProfileLight } from 'react-icons/pi';
 import ModalRemove from '../../../components/Modals/ModalRemove';
 import classNames from 'classnames';
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi';
+import withPermission from '../../../utils/withPermissions';
 
 const ServicesReport = () => {
   const navigate = useNavigate();
@@ -438,4 +439,9 @@ const ServicesReport = () => {
   );
 };
 
-export default ServicesReport;
+const ProtectedServiceReportView = withPermission(
+  ServicesReport,
+  'view_services_reports',
+);
+
+export default ProtectedServiceReportView;

@@ -5,7 +5,13 @@ import ModalRemove from '../../components/Modals/ModalRemove';
 import ModalViewer from '../../components/Modals/ModalViewer';
 import ImageViewer from '../../components/ImageViewer/ImageViewer';
 import { useNavigate } from 'react-router-dom';
-import { FaFileInvoiceDollar, FaEdit, FaEye, FaRegFile } from 'react-icons/fa';
+import {
+  FaFileInvoiceDollar,
+  FaEdit,
+  FaEye,
+  FaRegFile,
+  FaTrashAlt,
+} from 'react-icons/fa';
 import { Table as T } from 'flowbite-react';
 import { useQuery } from '@tanstack/react-query';
 import { searchRentals } from '../../services/rentals.api';
@@ -198,6 +204,9 @@ const Rentals = () => {
   };
 
   const isCreatePermission = useCheckPermissions('create_rentals');
+  const isUpdatePermission = useCheckPermissions('edit_rentals');
+  const isDeletePermission = useCheckPermissions('delete_rentals');
+  const isViewPermission = useCheckPermissions('view_rentals');
 
   return (
     <>
@@ -308,23 +317,36 @@ const Rentals = () => {
                             </span>
                           ) : column.type === 'actions' ? (
                             <div className="flex justify-center items-center gap-2">
-                              <LinkButton
-                                route={`/rentals/edit/${rental.id}`}
-                                label="Editar"
-                                icon={FaEdit}
-                                color="yellow"
-                              />
-                              <LinkButton
-                                route={`/rentals/view/${rental.id}`}
-                                label="Ver"
-                                icon={FaEye}
-                                color="cyan"
-                              />
                               <ActionButtons
-                                onRemove={() => {
-                                  setIsOpenModal(true);
-                                  setRentalId(rental.id);
-                                }}
+                                extraActions={[
+                                  {
+                                    label: 'Ver',
+                                    href: isViewPermission.hasPermission
+                                      ? `/rentals/view/${rental.id}`
+                                      : null,
+                                    color: 'cyan',
+                                    icon: FaEye,
+                                  },
+                                  {
+                                    label: 'Editar',
+                                    href: isUpdatePermission.hasPermission
+                                      ? `/rentals/edit/${rental.id}`
+                                      : null,
+                                    color: 'yellow',
+                                    icon: FaEdit,
+                                  },
+                                  {
+                                    label: 'Eliminar',
+                                    action: isDeletePermission.hasPermission
+                                      ? () => {
+                                          setRentalId(rental.id);
+                                          setIsOpenModal(true);
+                                        }
+                                      : null,
+                                    color: 'red',
+                                    icon: FaTrashAlt,
+                                  },
+                                ]}
                               />
                             </div>
                           ) : (

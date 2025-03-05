@@ -21,8 +21,10 @@ import {
   getStatusLabel,
   getStatusStyles,
 } from '../../utils/RentalStatus';
+import withPermission from '../../utils/withPermissions';
+import useCheckPermissions from '../../hooks/useCheckPermissions';
 
-const RentalView = () => {
+const ViewRental = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [rentalData, setRentalData] = useState(null);
@@ -120,6 +122,9 @@ const RentalView = () => {
     });
   };
 
+  const isViewRentalPermission = useCheckPermissions('view_rental');
+  const isUpdateRentalPermission = useCheckPermissions('update_rentals');
+
   return (
     <div
       id="rental-view-container"
@@ -137,10 +142,10 @@ const RentalView = () => {
                 Renta #{rental?.folio}
               </h1>
               <span
-                className={`inline-flex items-center gap-2 px-2 py-1 rounded-md text-sm font-medium ${getStatusStyles(rental.status)}`}
+                className={`inline-flex items-center gap-2 px-2 py-1 rounded-md text-sm font-medium ${getStatusStyles(rental?.status)}`}
               >
-                {getStatusIcon(rental.status)}
-                {getStatusLabel(rental.status)}
+                {getStatusIcon(rental?.status)}
+                {getStatusLabel(rental?.status)}
               </span>
             </div>
             <p className="text-neutral-500 text-sm">
@@ -158,7 +163,7 @@ const RentalView = () => {
             extraActions={[
               {
                 label: '',
-                href: '/rentals',
+                href: isViewRentalPermission.hasPermission ? '/rentals' : '/',
                 color: 'black',
                 icon: IoMdArrowRoundBack,
               },
@@ -170,7 +175,9 @@ const RentalView = () => {
               },
               {
                 label: '',
-                href: `/reports/repairs/edit/${id}`,
+                href: isUpdateRentalPermission.hasPermission
+                  ? `/rentals/edit/${id}`
+                  : '/',
                 icon: FaPen,
                 color: 'mycad',
                 filled: true,
@@ -337,4 +344,6 @@ const RentalView = () => {
   );
 };
 
-export default RentalView;
+const ProtectedRentalsView = withPermission(ViewRental, 'view_rentals');
+
+export default ProtectedRentalsView;

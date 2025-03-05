@@ -60,8 +60,8 @@ const AuthorizedRoute = ({ user }) => {
             <Sidebar>
               <Routes>
                 <Route element={<ProtectedRoute user={user} />}>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/" element={<Vehicles />} />
+                  {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                   <Route path="/account-settings" element={<Account />} />
                   <Route path="/users" element={<Users />} />
                   <Route path="/vehicles" element={<Vehicles />} />

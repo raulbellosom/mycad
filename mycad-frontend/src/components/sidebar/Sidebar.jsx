@@ -243,7 +243,7 @@ const Sidebar = ({ children }) => {
             />
             <div className="border-t md:border-none border-gray-300 py-1" />
             <Menu menuItemStyles={menuItemStyles}>
-              {isDashBoardPermission.hasPermission && (
+              {/* {isDashBoardPermission.hasPermission && (
                 <MenuItem
                   component={<Link to={'/dashboard'} />}
                   active={isActivePath('/dashboard')}
@@ -251,7 +251,7 @@ const Sidebar = ({ children }) => {
                 >
                   Dashboard
                 </MenuItem>
-              )}
+              )} */}
               {(isCatalogsPermission ||
                 isVehiclesPermission.hasPermission ||
                 isCreateVehiclesPermission.hasPermission) && (
