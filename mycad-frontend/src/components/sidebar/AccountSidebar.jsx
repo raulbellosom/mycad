@@ -2,6 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import MyCAD_ICON from '../../assets/logo/mycad_icon.webp';
 import ImageViewer from '../ImageViewer/ImageViewer';
+import { Link } from 'react-router-dom';
 
 const AccountSidebar = ({ name, role, photo, collapsed, broken }) => {
   const logoClasses = classNames(
@@ -18,7 +19,8 @@ const AccountSidebar = ({ name, role, photo, collapsed, broken }) => {
   );
   return (
     <div className="p-4 h-fit space-y-5">
-      <div
+      <Link
+        to="/"
         className={`w-full overflow-hidden whitespace-nowrap text-nowrap flex justify-start gap-4 items-center`}
       >
         <img src={MyCAD_ICON} alt="MyCAD ICON" className={logoClasses} />
@@ -27,7 +29,7 @@ const AccountSidebar = ({ name, role, photo, collapsed, broken }) => {
         >
           MyCAD
         </span>
-      </div>
+      </Link>
       {broken && (
         <div
           className={classNames(
