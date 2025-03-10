@@ -90,6 +90,17 @@ export const deleteRole = async (req, res) => {
         .json({ error: "No se puede eliminar un rol asignado a un usuario." });
     }
 
+    // check if role has permissions
+    const rolePermissions = await db.rolePermission.findMany({
+      where: { roleId: parseInt(id) },
+    });
+
+    if (rolePermissions.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "No se puede eliminar un rol con permisos asignados." });
+    }
+
     await db.role.delete({
       where: { id: parseInt(id) },
     });

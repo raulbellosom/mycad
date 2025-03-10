@@ -23,6 +23,12 @@ const usersColumns = [
     type: 'text',
   },
   {
+    id: 'userName',
+    value: 'Usuario',
+    order: 'asc',
+    type: 'text',
+  },
+  {
     id: 'phone',
     value: 'Teléfono',
     order: 'asc',

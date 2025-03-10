@@ -32,6 +32,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on createRole', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {
@@ -51,6 +52,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on updateRole', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {
@@ -70,6 +72,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on deleteRole', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {
@@ -88,6 +91,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on getRoles', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {
@@ -105,6 +109,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on getRoleById', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {
@@ -122,6 +127,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on getRolePermissions', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {
@@ -160,6 +166,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on createRolePermission', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {
@@ -179,6 +186,7 @@ const useRole = (dispatch) => {
     },
     onError: (error) => {
       console.log('error on deleteRolePermission', error);
+      Notifies('error', error?.response?.data?.error);
       setLoading(false);
     },
     onSettled: () => {

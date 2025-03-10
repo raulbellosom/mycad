@@ -37,6 +37,7 @@ model User {
   firstName String
   lastName  String
   email     String      @unique
+  userName  String      @unique
   phone     String?
   password  String
   status    Boolean?

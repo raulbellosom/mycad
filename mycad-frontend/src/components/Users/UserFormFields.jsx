@@ -3,7 +3,7 @@ import { Field } from 'formik';
 import TextInput from '../Inputs/TextInput';
 import SelectInput from '../Inputs/SelectInput';
 import { BiUser } from 'react-icons/bi';
-import { FaEnvelope } from 'react-icons/fa';
+import { FaEnvelope, FaUserCheck } from 'react-icons/fa';
 import { FaPhoneAlt } from 'react-icons/fa';
 import { FaLock } from 'react-icons/fa';
 import { MdManageAccounts } from 'react-icons/md';
@@ -38,12 +38,31 @@ const UserFormFields = ({ roles, editMode }) => {
         icon={FaEnvelope}
       />
       <Field
+        name="userName"
+        id="userName"
+        component={TextInput}
+        label="Nombre de Usuario"
+        type="text"
+        icon={FaUserCheck}
+      />
+      <Field
         name="phone"
         id="phone"
         component={TextInput}
         label="Teléfono"
         type="text"
         icon={FaPhoneAlt}
+      />
+      <Field
+        name="role"
+        id="role"
+        component={SelectInput}
+        label="Rol"
+        options={roles?.map((role) => ({
+          value: role.id,
+          label: role.name,
+        }))}
+        icon={MdManageAccounts}
       />
       {!editMode && (
         <Field
@@ -65,17 +84,6 @@ const UserFormFields = ({ roles, editMode }) => {
           icon={FaLock}
         />
       )}
-      <Field
-        name="role"
-        id="role"
-        component={SelectInput}
-        label="Rol"
-        options={roles?.map((role) => ({
-          value: role.id,
-          label: role.name,
-        }))}
-        icon={MdManageAccounts}
-      />
       {editMode && (
         <Field
           name="status"
