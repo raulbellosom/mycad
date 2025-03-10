@@ -22,9 +22,9 @@ const Login = () => {
       password: '',
     },
     validationSchema: Yup.object({
-      email: Yup.string()
-        .email('Invalid email address')
-        .required('Ingrese un correo electrónico válido'),
+      email: Yup.string().required(
+        'El correo electrónico o nombre de usuario es invalido',
+      ),
       password: Yup.string().required('La contraseña es invalida'),
     }),
     onSubmit: async (values) => {
@@ -56,8 +56,8 @@ const Login = () => {
               component={TextInput}
               id="email"
               name="email"
-              type="email"
-              label="Correo Electrónico"
+              type="text"
+              label="Correo Electrónico o Nombre de Usuario"
               icon={MdOutlineAlternateEmail}
             />
             <Field

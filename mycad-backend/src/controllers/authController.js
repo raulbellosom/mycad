@@ -3,7 +3,7 @@ import { db } from "../lib/db.js";
 import generateToken from "../utils/generateToken.js";
 
 export const register = async (req, res) => {
-  const { firstName, lastName, email, password, roleId } = req.body;
+  const { firstName, lastName, email, userName, password, roleId } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -13,6 +13,7 @@ export const register = async (req, res) => {
         firstName,
         lastName,
         email,
+        userName,
         password: hashedPassword,
         roleId,
       },
@@ -24,6 +25,7 @@ export const register = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        userName: user.userName,
         roleId: user.roleId,
       },
       token: generateToken(user.id),
@@ -37,8 +39,11 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await db.user.findUnique({
-      where: { email },
+    const user = await db.user.findFirst({
+      where: {
+        OR: [{ email }, { userName: email }],
+        enabled: true,
+      },
       include: {
         role: {
           include: {
@@ -70,7 +75,7 @@ export const login = async (req, res) => {
         token: generateToken(user.id),
       });
     } else {
-      res.status(401).json({ message: "Invalid email or password" });
+      res.status(401).json({ message: "Invalid email, user or password" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -83,7 +88,7 @@ export const loadUser = async (req, res) => {
   try {
     if (user) {
       const loadedUser = await db.user.findFirst({
-        where: { id: user.id },
+        where: { id: user.id, enabled: true },
         include: {
           role: {
             include: {

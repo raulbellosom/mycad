@@ -54,6 +54,7 @@ const Users = () => {
     firstName: '',
     lastName: '',
     email: '',
+    userName: '',
     phone: '',
     role: '',
     photo: '',
@@ -178,6 +179,7 @@ const Users = () => {
       firstName: item.firstName,
       lastName: item.lastName,
       email: item.email,
+      userName: item.userName,
       phone: item.phone,
       role: item.role.id,
       photo: '',
@@ -197,12 +199,14 @@ const Users = () => {
         firstName: '',
         lastName: '',
         email: '',
+        userName: '',
         phone: '',
         role: '',
         photo: '',
         status: true,
         password: '',
         repeatPassword: '',
+        id: '',
       });
       setEditMode(false);
       setIsOpenModal(false);
@@ -214,17 +218,20 @@ const Users = () => {
 
   const onCloseModal = () => {
     setIsOpenModal(false);
+    setChangePasswordModal(false);
     setEditMode(false);
     setInitialValues({
       firstName: '',
       lastName: '',
       email: '',
+      userName: '',
       phone: '',
       role: '',
       photo: '',
       status: true,
       password: '',
       repeatPassword: '',
+      id: '',
     });
   };
 
@@ -301,6 +308,7 @@ const Users = () => {
                     firstName: user.firstName,
                     lastName: user.lastName,
                     email: user.email,
+                    userName: user.userName,
                     phone: user.phone,
                     'role.name': user.role.name,
                     photo: user?.photo?.[0] ? [user.photo?.[0]] : [],
@@ -332,6 +340,7 @@ const Users = () => {
                         ) : column.id === 'firstName' ||
                           column.id === 'lastName' ||
                           column.id === 'email' ||
+                          column.id === 'userName' ||
                           column.id === 'phone' ||
                           column.id === 'role.name' ? (
                           <T.Cell

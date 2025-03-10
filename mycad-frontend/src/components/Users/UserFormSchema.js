@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 export const UserFormSchema = Yup.object().shape({
   firstName: Yup.string().required('El nombre es requerido'),
   lastName: Yup.string().required('El apellido es requerido'),
+  userName: Yup.string().required('El nombre de usuario es requerido'),
   email: Yup.string()
     .email('El correo electrónico no es válido')
     .required('El correo electrónico es requerido'),

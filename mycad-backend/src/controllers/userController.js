@@ -43,7 +43,7 @@ export const createUser = async (req, res) => {
     const { userData } = req.body;
     const { profileImage } = req;
 
-    const { firstName, lastName, email, password, phone, role } =
+    const { firstName, lastName, email, password, phone, role, userName } =
       JSON.parse(userData);
 
     const userExists = await db.user.findFirst({
@@ -53,6 +53,17 @@ export const createUser = async (req, res) => {
     if (userExists) {
       return res.status(400).json({ message: "El email ya está registrado." });
     }
+
+    const userNameExists = await db.user.findFirst({
+      where: { userName, enabled: true },
+    });
+
+    if (userNameExists) {
+      return res
+        .status(400)
+        .json({ message: "El nombre de usuario ya está registrado." });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const createdUser = await db.user.create({
       data: {
@@ -64,6 +75,7 @@ export const createUser = async (req, res) => {
         roleId: parseInt(role),
         enabled: true,
         status: true,
+        userName,
       },
     });
 
@@ -104,7 +116,7 @@ export const updateUser = async (req, res) => {
     const { userData } = req.body;
     const { profileImage } = req;
 
-    const { id, firstName, lastName, email, phone, role, status } =
+    const { id, firstName, lastName, email, phone, role, status, userName } =
       JSON.parse(userData);
 
     const userExists = await db.user.findFirst({ where: { id } });
@@ -120,6 +132,17 @@ export const updateUser = async (req, res) => {
     if (emailExists) {
       return res.status(400).json({ message: "El email ya está registrado." });
     }
+
+    const userNameExists = await db.user.findFirst({
+      where: { userName, NOT: { id }, enabled: true },
+    });
+
+    if (userNameExists) {
+      return res
+        .status(400)
+        .json({ message: "El nombre de usuario ya está registrado." });
+    }
+
     const updatedUser = await db.user.update({
       where: { id },
       data: {
@@ -129,6 +152,7 @@ export const updateUser = async (req, res) => {
         phone,
         status: parseStatus(status),
         roleId: parseInt(role),
+        userName,
       },
       include: {
         role: true,
@@ -240,6 +264,7 @@ export const searchUsers = async (req, res) => {
       "email",
       "phone",
       "role",
+      "userName",
     ];
     const textSearchConditions = searchTerm
       ? {
@@ -249,6 +274,7 @@ export const searchUsers = async (req, res) => {
             { email: { contains: searchTerm } },
             { phone: { contains: searchTerm } },
             { role: { name: { contains: searchTerm } } },
+            { userName: { contains: searchTerm } },
           ],
         }
       : {};
